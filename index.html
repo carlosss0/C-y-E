@@ -17,17 +17,6 @@
         #bg-canvas { position: fixed; inset: 0; width: 100vw; height: 100vh; display: block; z-index: 0; cursor: grab; }
         #bg-canvas:active { cursor: grabbing; }
 
-        /* ----- TÍTULO PRINCIPAL (TE AMO) ----- */
-        #te-amo-title {
-            position: fixed; top: 5vh; left: 50%; transform: translateX(-50%);
-            color: #fff; font-size: clamp(28px, 6vw, 42px); font-family: 'Georgia', serif;
-            font-style: italic; font-weight: bold; letter-spacing: 0.2em;
-            text-shadow: 0 0 20px #ff66b2, 0 0 35px #ff1493, 0 0 50px #ff0044;
-            z-index: 15; opacity: 0; pointer-events: none; transition: opacity 2.5s ease-in-out;
-            text-align: center; width: 100%;
-        }
-        #te-amo-title.show { opacity: 1; }
-
         #login-wrapper {
             position: fixed; inset: 0; z-index: 20; display: flex; align-items: center; justify-content: center;
             background: radial-gradient(ellipse at bottom, rgba(27,39,53,0.8) 0%, rgba(9,10,15,0.95) 100%);
@@ -69,7 +58,7 @@
         }
         #message-overlay.show #message-card { transform: translateY(0) scale(1); }
         #message-image-wrap {
-            position: relative; width: 100%; aspect-ratio: 3 / 2; overflow: hidden; border-radius: 18px; margin: 0 auto 24px;
+            position: relative; width: 100%; aspect-ratio: 3 / 2; overflow: hidden; border-radius: 18px; margin: 0 auto 30px;
             display: flex; align-items: center; justify-content: center; background: #000;
             box-shadow: 0 0 40px rgba(255,102,178,0.4); animation: floaty 4s ease-in-out infinite;
         }
@@ -77,7 +66,6 @@
         #message-image { position: relative; z-index: 1; max-width: 100%; height: 100%; object-fit: contain; border-radius: 12px; }
         @keyframes floaty { 0%, 100% { transform: translateY(0); } 50%  { transform: translateY(-10px); } }
         
-        /* Título de la tarjeta un poco más grande y sin texto descriptivo */
         #message-title { font-size: 32px; font-weight: 700; color: #fff; margin: 0 0 30px; letter-spacing: 0.05em; text-shadow: 0 0 20px rgba(255,102,178,0.7); font-style: italic; }
         
         #message-close { background: transparent; border: 1px solid rgba(255,102,178,0.5); color: rgba(255,220,230,0.9); padding: 10px 28px; font-size: 12px; letter-spacing: 0.2em; border-radius: 999px; cursor: pointer; transition: all 0.3s; }
@@ -86,7 +74,6 @@
 </head>
 <body>
 
-    <h1 id="te-amo-title">TE AMO</h1>
     <canvas id="bg-canvas"></canvas>
 
     <div id="login-wrapper">
@@ -101,27 +88,24 @@
 
     <div id="message-overlay">
         <div id="message-card">
-            <div id="message-image-wrap">
+            <div id="message-image-wrap" id="img-container">
                 <img id="message-image-bg" src="" alt="" aria-hidden="true" crossorigin="anonymous">
                 <img id="message-image" src="" alt="" crossorigin="anonymous">
             </div>
-            <!-- Solo se queda el título -->
             <h2 id="message-title"></h2>
             <button id="message-close">Cerrar ✦</button>
         </div>
     </div>
 
-    <!-- AQUÍ ESTÁN VINCULADAS TUS IMÁGENES EXACTAMENTE COMO LAS SUBISTE -->
     <script id="plate-gen">
+        // 5 Corazones con foto + 1 Spiderman = 6 Elementos
         window.plates = [
             { "name": "El amor de mi vida", "src": "imagen1.jpeg", "hue": 355, "pattern": "heart" },
-            { "name": "Mi todo", "icon": "spiderman.jpg", "src": "imagen2.jpeg", "hue": 0 },
+            { "name": "Mi todo", "src": "imagen2.jpeg", "hue": 0, "pattern": "heart" },
             { "name": "La niña de mis ojos", "src": "imagen3.jpeg", "hue": 350, "pattern": "heart" },
             { "name": "Mi universo entero", "src": "imagen4.jpeg", "hue": 358, "pattern": "heart" },
-            { "name": "Mi princesa", "src": "imagen5.jpeg", "hue": 355, "pattern": "heart" },
-            { "name": "Mi felicidad", "hue": 0, "pattern": "heart" }, // Estas no tienen foto, mostrarán el corazón mágico
-            { "name": "Mi refugio", "hue": 350, "pattern": "heart" },
-            { "name": "Para siempre", "hue": 358, "pattern": "heart" }
+            { "name": "TE AMO", "src": "imagen5.jpeg", "hue": 355, "pattern": "heart" },
+            { "name": "Spidey", "icon": "spiderman.png", "isSpidey": true } // Usar .png real
         ];
 
         function mulberry32(a) {
@@ -204,10 +188,6 @@
 
             experienceStarted = true;
             experienceStartMs = performance.now();
-
-            setTimeout(() => {
-                document.getElementById('te-amo-title').classList.add('show');
-            }, 5500);
 
             const canvas = document.getElementById('bg-canvas');
             const isMobile = window.innerWidth < 768;
@@ -347,13 +327,9 @@
 
                     const tt = Math.random();
                     if (isEdge) {
-                        colors[i3] = 1.0; 
-                        colors[i3+1] = 0.5 + tt * 0.5; 
-                        colors[i3+2] = 0.8 + tt * 0.2; 
+                        colors[i3] = 1.0; colors[i3+1] = 0.5 + tt * 0.5; colors[i3+2] = 0.8 + tt * 0.2; 
                     } else {
-                        colors[i3] = 0.4 + tt * 0.3; 
-                        colors[i3+1] = 0.0;          
-                        colors[i3+2] = 0.1 + tt * 0.2; 
+                        colors[i3] = 0.4 + tt * 0.3; colors[i3+1] = 0.0; colors[i3+2] = 0.1 + tt * 0.2; 
                     }
                     placed++;
                 }
@@ -366,41 +342,25 @@
 
             const generateInitials = () => {
                 const canvasText = document.createElement('canvas');
-                canvasText.width = 512;
-                canvasText.height = 256;
+                canvasText.width = 512; canvasText.height = 256;
                 const ctx = canvasText.getContext('2d');
                 
                 const gradient = ctx.createRadialGradient(256, 128, 10, 256, 128, 140);
                 gradient.addColorStop(0, 'rgba(0, 0, 0, 0.65)');
                 gradient.addColorStop(1, 'rgba(0, 0, 0, 0)');
-                ctx.fillStyle = gradient;
-                ctx.fillRect(0, 0, 512, 256);
+                ctx.fillStyle = gradient; ctx.fillRect(0, 0, 512, 256);
 
-                ctx.textAlign = 'center';
-                ctx.textBaseline = 'middle';
+                ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
                 ctx.font = 'italic bold 110px "Georgia", serif';
                 
-                ctx.shadowColor = '#ff66b2';
-                ctx.shadowBlur = 30;
-                ctx.fillStyle = '#ffffff';
-                
-                ctx.fillText('E y C', 256, 128);
-                ctx.shadowBlur = 15;
-                ctx.fillText('E y C', 256, 128);
+                ctx.shadowColor = '#ff66b2'; ctx.shadowBlur = 30; ctx.fillStyle = '#ffffff';
+                ctx.fillText('E y C', 256, 128); ctx.shadowBlur = 15; ctx.fillText('E y C', 256, 128);
                 
                 const texture = new THREE.CanvasTexture(canvasText);
-                const material = new THREE.SpriteMaterial({ 
-                    map: texture, 
-                    transparent: true,
-                    blending: THREE.AdditiveBlending,
-                    depthTest: false,  
-                    depthWrite: false,
-                    opacity: 0 
-                });
+                const material = new THREE.SpriteMaterial({ map: texture, transparent: true, blending: THREE.AdditiveBlending, depthTest: false, depthWrite: false, opacity: 0 });
                 
                 initialsSprite = new THREE.Sprite(material);
-                initialsSprite.position.set(0, 3.2, 0); 
-                initialsSprite.scale.set(4.5, 2.25, 1);
+                initialsSprite.position.set(0, 3.2, 0); initialsSprite.scale.set(4.5, 2.25, 1);
                 scene.add(initialsSprite);
             };
 
@@ -429,30 +389,31 @@
                 const cvs = document.createElement('canvas');
                 cvs.width = size; cvs.height = size;
                 const ctx = cvs.getContext('2d');
-                ctx.drawImage(fallbackCanvas, 0, 0, size, size);
-
-                const tex = new THREE.CanvasTexture(cvs);
-                tex.anisotropy = 8; tex.needsUpdate = true;
-
+                
+                // Si es icono, dibujamos en grande y sin marco
                 if (plate.icon) {
+                    const tex = new THREE.CanvasTexture(cvs);
+                    tex.anisotropy = 8; tex.needsUpdate = true;
                     const image = new Image();
                     image.crossOrigin = 'anonymous';
                     image.onload = () => {
                         ctx.clearRect(0, 0, size, size);
-                        const bgGrad = ctx.createRadialGradient(size/2, size/2, 0, size/2, size/2, size * 0.48);
-                        bgGrad.addColorStop(0, `hsla(${plate.hue || 0}, 90%, 35%, 0.6)`);
-                        bgGrad.addColorStop(1, 'transparent');
-                        ctx.fillStyle = bgGrad; ctx.fillRect(0, 0, size, size);
-                        
-                        const scale = Math.min(size / image.width, size / image.height) * 0.8;
+                        // Hacemos el Spiderman lo más grande posible
+                        const scale = Math.min(size / image.width, size / image.height) * 0.95; 
                         const drawW = image.width * scale; const drawH = image.height * scale;
                         const drawX = (size - drawW) / 2; const drawY = (size - drawH) / 2;
                         ctx.drawImage(image, drawX, drawY, drawW, drawH);
                         tex.needsUpdate = true;
                     };
                     image.src = plate.icon;
+                    return tex;
+                } else {
+                    // Si es corazón normal, dibujamos el marco primero
+                    ctx.drawImage(fallbackCanvas, 0, 0, size, size);
+                    const tex = new THREE.CanvasTexture(cvs);
+                    tex.anisotropy = 8; tex.needsUpdate = true;
+                    return tex;
                 }
-                return tex;
             }
 
             window.plates.forEach((p, i) => {
@@ -460,8 +421,15 @@
                 const canvasTex = createCenteredPlateTexture(p, fallbackCanvas);
                 const mesh = new THREE.Mesh(new THREE.CircleGeometry(1.05 * 0.5, 64), new THREE.MeshBasicMaterial({ map: canvasTex, transparent: true, side: THREE.DoubleSide, depthWrite: false }));
                 mesh.userData = { plate: p, index: i };
+                
+                // Matemática para distribuir exactamente 6 elementos en círculo
+                const total = window.plates.length;
+                const pairIndex = Math.floor(i / 2);
+                const pairs = Math.ceil(total / 2);
+                const baseAngle = (pairIndex / pairs) * Math.PI * 2;
                 const ring = i % 2;
-                plateMeshes.push({ mesh, radius: ring === 0 ? 4.2 : 6.8, baseAngle: (Math.floor(i/2) / Math.ceil(window.plates.length/2)) * Math.PI*2, speed: ring === 0 ? 0.06 : -0.04, tilt: ring === 0 ? 0.15 : -0.2, yOffset: (ring === 0 ? 0.8 : -0.5) + Math.sin(i)*0.25, wobblePhase: i * 0.7 });
+                
+                plateMeshes.push({ mesh, radius: ring === 0 ? 4.2 : 6.8, baseAngle: baseAngle, speed: ring === 0 ? 0.06 : -0.04, tilt: ring === 0 ? 0.15 : -0.2, yOffset: (ring === 0 ? 0.8 : -0.5) + Math.sin(i)*0.25, wobblePhase: i * 0.7 });
                 plateGroup.add(mesh);
             });
 
@@ -554,16 +522,22 @@
                     raycaster.setFromCamera(pointer, camera);
                     const hits = raycaster.intersectObjects(plateMeshes.map(d => d.mesh).filter(m => m.visible), false);
                     if (hits.length > 0) {
-                        document.getElementById('message-title').textContent = hits[0].object.userData.plate.name;
+                        const plate = hits[0].object.userData.plate;
                         
-                        // LÓGICA DE FOTOS EN EL MODAL SIN TEXTO
-                        const src = hits[0].object.userData.plate.src;
-                        if(src){
-                            document.getElementById('message-image').src = src;
-                            document.getElementById('message-image-bg').src = src;
+                        // LÓGICA DE SPIDERMAN: No abre foto, solo un mensaje especial
+                        if (plate.isSpidey) {
+                            document.getElementById('message-title').textContent = "¡Thwip! 🕸️ Un beso de tu amigable vecino ❤️";
+                            document.getElementById('message-image-wrap').style.display = 'none'; // Ocultamos el contenedor de imagen
                         } else {
-                            document.getElementById('message-image').src = window.makePlateCanvas(hits[0].object.userData.plate, hits[0].object.userData.index * 137, 512).toDataURL();
-                            document.getElementById('message-image-bg').src = document.getElementById('message-image').src;
+                            // LÓGICA DE FOTOS NORMALES
+                            document.getElementById('message-title').textContent = plate.name;
+                            document.getElementById('message-image-wrap').style.display = 'flex'; // Mostramos el contenedor de imagen
+                            
+                            const src = plate.src;
+                            if(src){
+                                document.getElementById('message-image').src = src;
+                                document.getElementById('message-image-bg').src = src;
+                            }
                         }
                         
                         document.getElementById('message-overlay').classList.add('show');
