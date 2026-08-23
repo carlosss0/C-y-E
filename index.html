@@ -92,14 +92,16 @@
         }
         @keyframes starsMove { to { background-position: 0 -500px, 150px -400px, -100px -300px; } }
 
-        /* Contenedor de Textos Interactivos Ajustado */
+        /* Contenedor de Textos Interactivos Ajustado para Celular */
         .bq-texts {
-            position: relative; z-index: 10; width: 95%; max-width: 700px;
-            text-align: center; margin-top: 3vh; /* Subido para dar espacio al ramo */
+            position: relative; z-index: 100; width: 95%; max-width: 700px;
+            text-align: center; margin-top: 5vh; 
         }
         .bq-line {
-            font-size: clamp(20px, 5vw, 28px); margin-bottom: 10px; /* Letras compactadas */
-            color: #a8f7ff; text-shadow: 0 0 10px rgba(168,247,255,0.7), 0 0 20px rgba(100,88,255,0.5); 
+            font-size: clamp(17px, 4.5vw, 24px); margin-bottom: 8px; 
+            color: #a8f7ff; 
+            /* Agregamos una sombra negra de base para garantizar que se lea si cruza el ramo */
+            text-shadow: 0 0 10px rgba(168,247,255,0.7), 0 0 20px rgba(100,88,255,0.5), 0 0 30px #000;  
             font-family: 'Georgia', serif; font-style: italic; font-weight: bold;
             display: none; opacity: 0;
         }
@@ -108,8 +110,8 @@
             animation: bqFade 1s forwards;
         }
         .bq-line.final {
-            font-size: clamp(28px, 8vw, 42px); font-weight: bold; color: #ff66b2;
-            text-shadow: 0 0 15px #ff66b2, 0 0 30px #ff1493; margin-top: 20px;
+            font-size: clamp(24px, 7vw, 36px); font-weight: bold; color: #ff66b2;
+            text-shadow: 0 0 15px #ff66b2, 0 0 30px #ff1493, 0 0 40px #000; margin-top: 15px;
             font-style: normal; letter-spacing: 0.05em;
         }
         @keyframes bqFade { to { opacity: 1; transform: translateY(0); } from { transform: translateY(15px); } }
@@ -118,19 +120,19 @@
         #tap-hint {
             position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%);
             font-size: 14px; color: rgba(255,255,255,0.6); pointer-events: none;
-            animation: hintPulse 2s infinite; z-index: 50; display: none;
+            animation: hintPulse 2s infinite; z-index: 100; display: none;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             white-space: nowrap;
         }
         @keyframes hintPulse { 0%, 100% { opacity: 0.3; } 50% { opacity: 1; } }
 
-        /* Ramo ajustado: Más abajo y ligeramente escalado */
+        /* Ramo Empujado hacia Abajo */
         .bouquet {
-            position: absolute; bottom: -8vh; /* Se empuja hacia abajo para no chocar */
+            position: absolute; bottom: -15vh; /* Hundido para dejar espacio libre a los textos */
             width: 100%; max-width: 600px; height: 50vh; min-height: 450px;
-            z-index: 2; transform: scale(0.85); animation: rise 2.5s ease forwards;
+            z-index: 2; transform-origin: bottom center; animation: rise 2.5s ease forwards;
         }
-        @keyframes rise { from { opacity: 0; transform: translateY(200px) scale(0.7); } to { opacity: 1; transform: translateY(0) scale(0.85); } }
+        @keyframes rise { from { opacity: 0; transform: translateY(200px) scale(0.6); } to { opacity: 1; transform: translateY(0) scale(0.75); } }
 
         .flower { position: absolute; transform-origin: bottom center; animation: sway 3.5s ease-in-out infinite alternate; }
         @keyframes sway { from { transform: rotate(var(--r)); } to { transform: rotate(calc(var(--r) + 5deg)); } }
@@ -256,6 +258,7 @@
             const bq = document.getElementById('bouquet-container');
             const txt = document.getElementById('bq-texts-container');
             
+            // Textos modificados por el usuario
             txt.innerHTML = `
                 <div class="bq-line">Quiero decirte que me haces muy feliz.</div>
                 <div class="bq-line">Desde que te conocí, todo es mucho mejor.</div>
@@ -271,13 +274,12 @@
                 const isTulip = i % 2 === 0; 
                 const pct = i / 31; 
                 
-                // Distribución EN ABANICO mucho más separada
                 const left = -10 + (pct * 120); 
                 const rot = -65 + (pct * 130); 
                 
-                // Arco pronunciado para que las de en medio suban y las orillas bajen
+                // Flores más abajo en los bordes para liberar el centro
                 const archHeight = Math.sin(pct * Math.PI); 
-                const bottomOffset = -20 + (archHeight * 120) + (Math.random() * 20); 
+                const bottomOffset = -40 + (archHeight * 100) + (Math.random() * 20); 
                 
                 const animDelay = (Math.random() * -3).toFixed(2); 
                 
@@ -682,7 +684,8 @@
                         const angle  = d.baseAngle + t * d.speed;
                         d.mesh.position.set(Math.cos(angle) * d.radius, d.yOffset + Math.sin(t * 0.4 + d.wobblePhase) * 0.3 + Math.sin(angle) * d.tilt, Math.sin(angle) * d.radius);
                         
-                        const baseScale = d.isSpidey ? 2.2 : 1.0; 
+                        // REDUCCIÓN DEL TAMAÑO DE SPIDEY AQUÍ
+                        const baseScale = d.isSpidey ? 1.3 : 1.0; 
                         d.mesh.scale.setScalar(easeOutCubic(localP) * baseScale);
                         
                         d.mesh.lookAt(camera.position);
