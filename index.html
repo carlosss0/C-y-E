@@ -4,10 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Para ti</title>
-
+ 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
-
+ 
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
         html, body {
@@ -17,7 +17,7 @@
         }
         #bg-canvas { position: fixed; inset: 0; width: 100vw; height: 100vh; display: block; z-index: 0; cursor: grab; }
         #bg-canvas:active { cursor: grabbing; }
-
+ 
         /* ----- PANTALLA DE LOGIN ----- */
         #login-wrapper {
             position: fixed; inset: 0; z-index: 20; display: flex; align-items: center; justify-content: center;
@@ -46,7 +46,7 @@
             display: none; animation: fadeIn 0.5s;
         }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
-
+ 
         /* ----- MODAL DE FOTOS ----- */
         #message-overlay {
             position: fixed; inset: 0; background: radial-gradient(ellipse at center, rgba(40,5,15,0.85), rgba(0,0,0,0.95));
@@ -72,7 +72,7 @@
         #message-title { font-size: 32px; font-weight: 700; color: #fff; margin: 0 0 30px; letter-spacing: 0.05em; text-shadow: 0 0 20px rgba(255,102,178,0.7); font-style: italic; }
         #message-close { background: transparent; border: 1px solid rgba(255,102,178,0.5); color: rgba(255,220,230,0.9); padding: 10px 28px; font-size: 12px; letter-spacing: 0.2em; border-radius: 999px; cursor: pointer; transition: all 0.3s; }
         #message-close:hover { background: rgba(255,102,178,0.5); color: #fff; }
-
+ 
         /* ----- PANTALLA DEL RAMO (BOUQUET) ----- */
         #bouquet-overlay {
             position: fixed; inset: 0; background: radial-gradient(circle, #061616, #000 75%);
@@ -91,7 +91,7 @@
             animation: starsMove 10s linear infinite; opacity: 0.7; z-index: 1;
         }
         @keyframes starsMove { to { background-position: 0 -500px, 150px -400px, -100px -300px; } }
-
+ 
         /* Contenedor de Textos Interactivos Ajustado para Celular */
         .bq-texts {
             position: relative; z-index: 100; width: 95%; max-width: 700px;
@@ -115,7 +115,7 @@
             font-style: normal; letter-spacing: 0.05em;
         }
         @keyframes bqFade { to { opacity: 1; transform: translateY(0); } from { transform: translateY(15px); } }
-
+ 
         /* Hint (Toca para continuar) */
         #tap-hint {
             position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%);
@@ -125,7 +125,7 @@
             white-space: nowrap;
         }
         @keyframes hintPulse { 0%, 100% { opacity: 0.3; } 50% { opacity: 1; } }
-
+ 
         /* Ramo Empujado hacia Abajo */
         .bouquet {
             position: absolute; bottom: -15vh; /* Hundido para dejar espacio libre a los textos */
@@ -133,35 +133,35 @@
             z-index: 2; transform-origin: bottom center; animation: rise 2.5s ease forwards;
         }
         @keyframes rise { from { opacity: 0; transform: translateY(200px) scale(0.6); } to { opacity: 1; transform: translateY(0) scale(0.75); } }
-
+ 
         .flower { position: absolute; transform-origin: bottom center; animation: sway 3.5s ease-in-out infinite alternate; }
         @keyframes sway { from { transform: rotate(var(--r)); } to { transform: rotate(calc(var(--r) + 5deg)); } }
-
+ 
         .stem { width: 8px; height: 350px; background: linear-gradient(#8fffff, #087979); border-radius: 20px; box-shadow: 0 0 15px cyan; }
         .leaf { position: absolute; width: 45px; height: 85px; background: linear-gradient(135deg, #68ffff, #0b7777); border-radius: 100% 0 100% 0; box-shadow: 0 0 12px cyan; }
         .leaf.left { top: 170px; left: -42px; transform: rotate(-35deg); }
         .leaf.right { top: 230px; left: 5px; transform: rotate(40deg) scaleX(-1); }
-
+ 
         .iris-head { position: absolute; top: -55px; left: -45px; width: 100px; height: 100px; }
         .iris-head span { position: absolute; width: 55px; height: 78px; background: linear-gradient(#fff, #a8f7ff, #6458ff); border-radius: 60% 60% 25% 60%; box-shadow: 0 0 15px white, 0 0 35px cyan; }
         .iris-head span:nth-child(1) { left: 22px; top: 0; }
         .iris-head span:nth-child(2) { left: 0; top: 30px; transform: rotate(-55deg); }
         .iris-head span:nth-child(3) { right: 0; top: 30px; transform: rotate(55deg); }
         .center { position: absolute; width: 32px; height: 13px; background: #fff59d; border-radius: 50%; top: 58px; left: 34px; box-shadow: 0 0 15px yellow; }
-
+ 
         .tulip-head { position: absolute; top: -58px; left: -35px; width: 80px; height: 85px; }
         .tulip-head span { position: absolute; bottom: 0; width: 45px; height: 75px; background: linear-gradient(#fff, #ffc2ef, #ff4fc3); border-radius: 50% 50% 15% 15%; box-shadow: 0 0 15px white, 0 0 30px #ff8be0; }
         .tulip-head span:nth-child(1) { left: 17px; z-index: 2; }
         .tulip-head span:nth-child(2) { left: 0; transform: rotate(-25deg); }
         .tulip-head span:nth-child(3) { right: 0; transform: rotate(25deg); }
         
-        #btn-volver { position: absolute; top: 20px; right: 20px; z-index: 50; background: rgba(255,255,255,0.1); border: 1px solid cyan; color: cyan; padding: 8px 15px; border-radius: 20px; cursor: pointer; }
+        #btn-volver { position: absolute; bottom: 20px; right: 20px; z-index: 50; background: rgba(255,255,255,0.1); border: 1px solid cyan; color: cyan; padding: 8px 15px; border-radius: 20px; cursor: pointer; }
     </style>
 </head>
 <body>
-
+ 
     <canvas id="bg-canvas"></canvas>
-
+ 
     <div id="login-wrapper">
         <div id="login-screen">
             <h2>¿Nombre del amor de tu vida?</h2>
@@ -171,7 +171,7 @@
             <div id="error-msg">Carlos y De La Rose ❤️</div>
         </div>
     </div>
-
+ 
     <div id="message-overlay">
         <div id="message-card">
             <div id="message-image-wrap" id="img-container">
@@ -182,7 +182,7 @@
             <button id="message-close">Cerrar ✦</button>
         </div>
     </div>
-
+ 
     <div id="bouquet-overlay" onclick="advanceText(event)">
         <div class="stars"></div>
         <button id="btn-volver" onclick="closeBouquet(event)">Volver</button>
@@ -194,10 +194,10 @@
         <div class="bouquet" id="bouquet-container">
             <!-- Flores inyectadas por JS -->
         </div>
-
+ 
         <div id="tap-hint">Toca la pantalla para continuar...</div>
     </div>
-
+ 
     <script id="plate-gen">
         window.plates = [
             { "name": "Mi persona favorita", "src": "imagen1.jpeg", "hue": 355, "pattern": "heart" },
@@ -207,7 +207,7 @@
             { "name": "La más bonita", "src": "imagen5.jpeg", "hue": 355, "pattern": "heart" },
             { "name": "Spidey", "icon": "spiderman.png", "isSpidey": true, "hue": 0 } 
         ];
-
+ 
         function mulberry32(a) {
             return function() {
                 a |= 0; a = a + 0x6D2B79F5 | 0; let t = a;
@@ -215,14 +215,14 @@
                 return ((t ^ t >>> 14) >>> 0) / 4294967296;
             };
         }
-
+ 
         window.makePlateCanvas = function(p, seed, size) {
             size = size || 512;
             const w = size, h = size;
             const cvs = document.createElement('canvas');
             cvs.width = w; cvs.height = h;
             const ctx = cvs.getContext('2d');
-
+ 
             ctx.clearRect(0, 0, w, h);
             const bgGrad = ctx.createRadialGradient(w/2, h/2, 0, w/2, h/2, w * 0.48);
             const hueValue = p.hue !== undefined ? p.hue : 350;
@@ -230,7 +230,7 @@
             bgGrad.addColorStop(1, 'transparent');
             
             ctx.fillStyle = bgGrad; ctx.fillRect(0, 0, w, h);
-
+ 
             if (p.pattern === 'heart') {
                 const cx = w/2, cy = h/2;
                 const heartPath = (scale) => {
@@ -249,11 +249,11 @@
             return cvs;
         };
     </script>
-
+ 
     <script>
         let currentLine = 0;
         let bouquetLines = [];
-
+ 
         function buildBouquet() {
             const bq = document.getElementById('bouquet-container');
             const txt = document.getElementById('bq-texts-container');
@@ -268,11 +268,11 @@
                 <div class="bq-line">Y porque ya no me imagino mis días sin ti...</div>
                 <div class="bq-line final">Estefany, ¿quieres ser mi novia?</div>
             `;
-
+ 
             let html = '';
-            for(let i = 0; i < 32; i++) {
+            for(let i = 0; i < 20; i++) {
                 const isTulip = i % 2 === 0; 
-                const pct = i / 31; 
+                const pct = i / 19; 
                 
                 const left = -10 + (pct * 120); 
                 const rot = -65 + (pct * 130); 
@@ -295,7 +295,7 @@
                 </div>`;
             }
             bq.innerHTML = html;
-
+ 
             currentLine = 0;
             bouquetLines = document.querySelectorAll('.bq-line');
             
@@ -304,10 +304,10 @@
                 advanceText({ target: {} }); 
             }, 2000);
         }
-
+ 
         function advanceText(e) {
             if (e.target.id === 'btn-volver') return;
-
+ 
             if (currentLine < bouquetLines.length) {
                 bouquetLines[currentLine].classList.add('visible');
                 currentLine++;
@@ -317,20 +317,20 @@
                 }
             }
         }
-
+ 
         function closeBouquet(e) {
             e.stopPropagation(); 
             document.getElementById('bouquet-overlay').classList.remove('show');
             document.getElementById('bouquet-container').innerHTML = ''; 
             document.getElementById('tap-hint').style.display = 'none';
         }
-
+ 
         const loginWrapper = document.getElementById('login-wrapper');
         const loginScreen = document.getElementById('login-screen');
         const nameInput = document.getElementById('name-input');
         const btnEnter = document.getElementById('btn-enter');
         const errorMsg = document.getElementById('error-msg');
-
+ 
         function checkName() {
             const input = nameInput.value.trim().toLowerCase();
             const normalizedInput = input.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
@@ -356,63 +356,63 @@
         btnEnter.addEventListener('click', checkName);
         nameInput.addEventListener('keypress', e => { if (e.key === 'Enter') checkName(); });
     </script>
-
+ 
     <script>
         let experienceStarted = false;
         let experienceStartMs = 0;
-
+ 
         function startExperience() {
             if (experienceStarted) return;
             if (typeof THREE === 'undefined') throw new Error("La librería de gráficos 3D no se descargó correctamente.");
-
+ 
             experienceStarted = true;
             experienceStartMs = performance.now();
-
+ 
             const canvas = document.getElementById('bg-canvas');
             const isMobile = window.innerWidth < 768;
-
+ 
             const scene = new THREE.Scene();
             scene.fog = new THREE.FogExp2(0x000000, 0.018);
             const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 200);
             camera.position.set(6, 4, 10);
             scene.add(camera);
-
+ 
             const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
             renderer.setSize(window.innerWidth, window.innerHeight);
             renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
-
+ 
             const controls = new THREE.OrbitControls(camera, canvas);
             controls.enableDamping = true; controls.enableZoom = true; controls.enablePan = true;
             controls.zoomSpeed = 0.8; controls.rotateSpeed = 0.5; controls.dampingFactor = 0.06;
-
+ 
             const parameters = {
                 count: isMobile ? 25000 : 70000, size: isMobile ? 0.025 : 0.017,
                 radius: 8, branches: 4, spin: 1, randomness: 0.3, randomnessPower: 3,
                 insideColor: '#ffb3d9', outsideColor: '#ff1493', jetCount: isMobile ? 2500 : 6000
             };
-
+ 
             let geometry, material, points, jetGeometry, jetMaterial, jetPoints, blackHoleMesh, accretionMesh, accretionMeshHalo, accretionPoints;
             let initialsSprite = null; 
             let jetVelocities = [];
-
+ 
             const generateBlackHole = () => {
                 blackHoleMesh = new THREE.Mesh(new THREE.SphereGeometry(0.3, 32, 32), new THREE.MeshBasicMaterial({ color: 0x000000 }));
                 scene.add(blackHoleMesh);
-
+ 
                 accretionMesh = new THREE.Mesh(
                     new THREE.RingGeometry(0.35, 0.85, 64, 8),
                     new THREE.MeshBasicMaterial({ color: 0xff66b2, side: THREE.DoubleSide, transparent: true, opacity: 0.78, blending: THREE.AdditiveBlending })
                 );
                 accretionMesh.rotation.x = Math.PI / 2;
                 scene.add(accretionMesh);
-
+ 
                 accretionMeshHalo = new THREE.Mesh(
                     new THREE.RingGeometry(0.32, 0.55, 64, 8),
                     new THREE.MeshBasicMaterial({ color: 0xff1493, side: THREE.DoubleSide, transparent: true, opacity: 0.48, blending: THREE.AdditiveBlending })
                 );
                 accretionMeshHalo.rotation.y = Math.PI / 3;
                 scene.add(accretionMeshHalo);
-
+ 
                 const accParticlesCount = isMobile ? 2000 : 5000;
                 const accGeo = new THREE.BufferGeometry();
                 const accPos = new Float32Array(accParticlesCount * 3);
@@ -431,7 +431,7 @@
                 accretionPoints = new THREE.Points(accGeo, new THREE.PointsMaterial({ size: 0.014, vertexColors: true, blending: THREE.AdditiveBlending, depthWrite: false }));
                 scene.add(accretionPoints);
             };
-
+ 
             const generateGalaxy = () => {
                 geometry = new THREE.BufferGeometry();
                 const positions = new Float32Array(parameters.count * 3);
@@ -462,7 +462,7 @@
                 points = new THREE.Points(geometry, material);
                 scene.add(points);
             };
-
+ 
             const heartPoint = (t) => ({
                 x: 16 * Math.pow(Math.sin(t), 3) * 0.13,
                 y: (13 * Math.cos(t) - 5*Math.cos(2*t) - 2*Math.cos(3*t) - Math.cos(4*t)) * 0.13
@@ -471,7 +471,7 @@
                 const X = x / 1.2, Y = y / 1.2;
                 return Math.pow(X*X + Y*Y - 1, 3) - X*X * Y*Y*Y < 0;
             };
-
+ 
             const generateJet = () => {
                 jetGeometry = new THREE.BufferGeometry();
                 const positions = new Float32Array(parameters.jetCount * 3);
@@ -503,7 +503,7 @@
                         phase: Math.random() * Math.PI * 2, freq: 0.5 + Math.random() * 0.8, amp: 0.04 + Math.random() * 0.08,
                         emergeDelay: Math.random() * 0.9, emergeDuration: 0.7 + Math.random() * 0.7
                     });
-
+ 
                     const tt = Math.random();
                     if (isEdge) {
                         colors[i3] = 1.0; colors[i3+1] = 0.5 + tt * 0.5; colors[i3+2] = 0.8 + tt * 0.2; 
@@ -518,7 +518,7 @@
                 jetPoints = new THREE.Points(jetGeometry, jetMaterial);
                 scene.add(jetPoints);
             };
-
+ 
             const generateInitials = () => {
                 const canvasText = document.createElement('canvas');
                 canvasText.width = 512; canvasText.height = 256;
@@ -528,7 +528,7 @@
                 gradient.addColorStop(0, 'rgba(0, 0, 0, 0.65)');
                 gradient.addColorStop(1, 'rgba(0, 0, 0, 0)');
                 ctx.fillStyle = gradient; ctx.fillRect(0, 0, 512, 256);
-
+ 
                 ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
                 ctx.font = 'italic bold 110px "Georgia", serif';
                 
@@ -542,7 +542,7 @@
                 initialsSprite.position.set(0, 3.2, 0); initialsSprite.scale.set(4.5, 2.25, 1);
                 scene.add(initialsSprite);
             };
-
+ 
             const generateBgStars = () => {
                 const starGeo = new THREE.BufferGeometry();
                 const starCount = isMobile ? 1500 : 3500;
@@ -559,7 +559,7 @@
                 starGeo.setAttribute('position', new THREE.BufferAttribute(starPos, 3));
                 scene.add(new THREE.Points(starGeo, new THREE.PointsMaterial({ color: 0xffdcf4, size: isMobile ? 0.07 : 0.04, transparent: true, opacity: 0.6, depthWrite: false })));
             };
-
+ 
             const plateGroup = new THREE.Group(); scene.add(plateGroup);
             const plateMeshes = [];
             
@@ -591,7 +591,7 @@
                     return tex;
                 }
             }
-
+ 
             window.plates.forEach((p, i) => {
                 const fallbackCanvas = window.makePlateCanvas(p, i * 137, 512);
                 const canvasTex = createCenteredPlateTexture(p, fallbackCanvas);
@@ -616,20 +616,20 @@
                 });
                 plateGroup.add(mesh);
             });
-
+ 
             generateBlackHole(); generateGalaxy(); generateJet(); generateInitials(); generateBgStars();
-
+ 
             if (points) points.visible = false;
             [accretionMesh, accretionMeshHalo, accretionPoints, blackHoleMesh, jetPoints].forEach(o => { if (o) o.visible = false; });
             plateMeshes.forEach(d => { d.mesh.visible = false; d.mesh.scale.set(0.001,0.001,0.001); });
             camera.position.set(40, 25, 50);
-
+ 
             const easeOutCubic = x => 1 - Math.pow(1 - x, 3);
             const easeOutBack  = x => { const c = 1.70158; return 1 + (c+1) * Math.pow(x-1,3) + c * Math.pow(x-1,2); };
-
+ 
             const tick = () => {
                 const t = (performance.now() - experienceStartMs) / 1000;
-
+ 
                 if (t < 9) {
                     const p = easeOutCubic(Math.min(1, t / 9));
                     camera.position.lerpVectors(new THREE.Vector3(40,25,50), new THREE.Vector3(3.5,2.5,6), p);
@@ -637,7 +637,7 @@
                 } else {
                     controls.enabled = true;
                 }
-
+ 
                 if (t > 0.8 && blackHoleMesh) {
                     blackHoleMesh.visible = accretionMesh.visible = accretionMeshHalo.visible = accretionPoints.visible = true;
                     const s = easeOutBack(Math.min(1, (t - 0.8) / 2.2));
@@ -648,7 +648,7 @@
                     points.rotation.y = t * 0.05;
                     points.scale.setScalar(easeOutCubic(Math.min(1, (t - 2.5) / 4.5)));
                 }
-
+ 
                 if (t > 4.4 && jetPoints) {
                     jetPoints.visible = true;
                     const heartT = t - 4.4;
@@ -666,7 +666,7 @@
                         pos[i3] = fx * eased; pos[i3+1] = fy * eased + Math.sin(eased * Math.PI) * 0.6 * (1-eased); pos[i3+2] = fz * eased;
                     }
                     jetPoints.geometry.attributes.position.needsUpdate = true;
-
+ 
                     if (initialsSprite) {
                         const pInitials = Math.max(0, Math.min(1, (t - 4.4) / 2.0)); 
                         const easedInitials = 1 - Math.pow(1 - pInitials, 3);
@@ -676,7 +676,7 @@
                         initialsSprite.material.opacity = easedInitials * (0.8 + Math.sin(t * 3) * 0.2);
                     }
                 }
-
+ 
                 plateMeshes.forEach((d, i) => {
                     if (t > 5.8 + i * 0.12) {
                         d.mesh.visible = true;
@@ -691,18 +691,18 @@
                         d.mesh.lookAt(camera.position);
                     }
                 });
-
+ 
                 controls.update();
                 renderer.render(scene, camera);
                 window.requestAnimationFrame(tick);
             };
             tick();
-
+ 
             window.addEventListener('resize', () => {
                 camera.aspect = window.innerWidth / window.innerHeight; camera.updateProjectionMatrix();
                 renderer.setSize(window.innerWidth, window.innerHeight);
             });
-
+ 
             const raycaster = new THREE.Raycaster(); const pointer = new THREE.Vector2();
             canvas.addEventListener('pointerup', e => {
                 if ((performance.now() - experienceStartMs)/1000 > 9) {
