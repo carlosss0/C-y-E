@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Galaxy Love</title>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        html, body {
+            height: 100%; background: #000; overflow: hidden;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        #bg-canvas { position: fixed; inset: 0; width: 100vw; height: 100vh; display: block; z-index: 0; cursor: grab; }
+        #bg-canvas:active { cursor: grabbing; }
+
+        #login-wrapper {
+            position: fixed; inset: 0; z-index: 20;
+            display: flex; align-items: center; justify-content: center;
+            background: radial-gradient(ellipse at bottom, rgba(27,39,53,0.8) 0%, rgba(9,10,15,0.95) 100%);
+            backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+            transition: opacity 0.8s ease, visibility 0.8s ease;
+        }
+        #login-screen {
+            position: relative; background: rgba(255, 255, 255, 0.05);
+            padding: 40px 30px; border-radius: 20px; text-align: center;
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.3); border: 1px solid rgba(255, 255, 255, 0.1); width: 300px;
+            transition: transform 0.8s ease; color: white;
+        }
+        #login-screen h2 { margin-top: 0; margin-bottom: 25px; font-weight: 400; font-size: 22px; }
+        #name-input {
+            padding: 12px 15px; border-radius: 25px; border: none; outline: none;
+            font-size: 16px; width: 80%; margin-bottom: 20px; text-align: center;
+        }
+        #btn-enter {
+            background-color: #ff66b2; color: white; border: none; padding: 10px 30px;
+            font-size: 16px; font-weight: bold; border-radius: 25px; cursor: pointer;
+            transition: transform 0.2s, background-color 0.2s;
+        }
+        #btn-enter:hover { background-color: #ff4d94; transform: scale(1.05); }
+        #error-msg {
+            margin-top: 20px; color: #ffb3d9; font-size: 18px; font-weight: bold;
+            display: none; animation: fadeIn 0.5s;
+        }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+
+        #message-overlay {
+            position: fixed; inset: 0; background: radial-gradient(ellipse at center, rgba(40,5,15,0.85), rgba(0,0,0,0.95));
+            backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+            display: flex; align-items: center; justify-content: center; z-index: 10; opacity: 0; pointer-events: none;
+            transition: opacity 0.6s ease;
+        }
+        #message-overlay.show { opacity: 1; pointer-events: auto; }
+        #message-card {
+            max-width: 560px; padding: 48px 56px; text-align: center; transform: translateY(20px) scale(0.95);
+            transition: transform 0.6s cubic-bezier(0.2,0.8,0.2,1); position: relative;
+        }
+        #message-overlay.show #message-card { transform: translateY(0) scale(1); }
+        #message-image-wrap {
+            position: relative; width: 100%; aspect-ratio: 3 / 2; overflow: hidden; border-radius: 18px; margin: 0 auto 24px;
+            display: flex; align-items: center; justify-content: center; background: #000;
+            box-shadow: 0 0 40px rgba(255,102,178,0.4); animation: floaty 4s ease-in-out infinite;
+        }
+        #message-image-bg { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; filter: blur(18px) brightness(0.5) saturate(1.3); transform: scale(1.1); }
+        #message-image { position: relative; z-index: 1; max-width: 100%; height: 100%; object-fit: contain; border-radius: 12px; }
+        @keyframes floaty { 0%, 100% { transform: translateY(0); } 50%  { transform: translateY(-10px); } }
+        
+        #message-title { font-size: 28px; font-weight: 700; color: #fff; margin: 0 0 20px; letter-spacing: 0.05em; text-shadow: 0 0 20px rgba(255,102,178,0.7); font-style: italic; }
+        #message-text { font-size: 18px; line-height: 1.7; color: rgba(255,235,240,0.95); margin: 0 0 32px; text-wrap: pretty; }
+        #message-close { background: transparent; border: 1px solid rgba(255,102,178,0.5); color: rgba(255,220,230,0.9); padding: 10px 28px; font-size: 12px; letter-spacing: 0.2em; border-radius: 999px; cursor: pointer; transition: all 0.3s; }
+        #message-close:hover { background: rgba(255,102,178,0.5); color: #fff; }
+    </style>
+</head>
+<body>
+
+    <canvas id="bg-canvas"></canvas>
+
+    <div id="login-wrapper">
+        <div id="login-screen">
+            <h2>¿Nombre del amor de tu vida?</h2>
+            <input type="text" id="name-input" placeholder="Escribe aquí..." autocomplete="off">
+            <br>
+            <button id="btn-enter">Responder</button>
+            <div id="error-msg">Carlos y De La Rose ❤️</div>
+        </div>
+    </div>
+
+    <div id="message-overlay">
+        <div id="message-card">
+            <div id="message-image-wrap">
+                <img id="message-image-bg" src="" alt="" aria-hidden="true" crossorigin="anonymous">
+                <img id="message-image" src="" alt="" crossorigin="anonymous">
+            </div>
+            <h2 id="message-title"></h2>
+            <p id="message-text"></p>
+            <button id="message-close">Cerrar ✦</button>
+        </div>
+    </div>
+
+    <script id="plate-gen">
+        window.plates = [
+            { "name": "Me Encanta", "message": "Si pudiera elegir un lugar seguro, sería a tu lado...", "src": "3.png", "hue": 330, "pattern": "heart" },
+            { "name": "Para ti", "message": "Para ti, que haces latir mi corazón de un modo único.", "hue": 330, "pattern": "heart" },
+            { "name": "Brillo de tus Ojos", "message": "Tus ojos son las estrellas que iluminan mi galaxia.", "hue": 330, "pattern": "heart" },
+            { "name": "Para Siempre", "message": "No importa cuantas vidas viva, en todas te elegiría a ti.", "hue": 330, "pattern": "heart" },
+            { "name": "Aventuras juntos", "message": "No hay lugar en el mundo donde prefiera estar que a tu lado.", "hue": 330, "pattern": "heart" },
+            { "name": "Nuestro primer beso", "message": "Desde ese día, cada beso tuyo es mi galaxia favorita.", "hue": 330, "pattern": "heart" },
+            { "name": "Amor de mi Vida", "message": "Cuanto más tiempo pasamos juntos, más te amo.", "src": "5.png", "hue": 330, "pattern": "heart" },
+            { "name": "Mi refugio", "message": "Cuando el mundo hace ruido, solo necesito mirarte para encontrar paz.", "hue": 330, "pattern": "heart" }
+        ];
+
+        function mulberry32(a) {
+            return function() {
+                a |= 0; a = a + 0x6D2B79F5 | 0; let t = a;
+                t = Math.imul(t ^ t >>> 15, t | 1); t ^= t + Math.imul(t ^ t >>> 7, t | 61);
+                return ((t ^ t >>> 14) >>> 0) / 4294967296;
+            };
+        }
+
+        window.makePlateCanvas = function(p, seed, size) {
+            size = size || 512;
+            const w = size, h = size;
+            const cvs = document.createElement('canvas');
+            cvs.width = w; cvs.height = h;
+            const ctx = cvs.getContext('2d');
+
+            ctx.clearRect(0, 0, w, h);
+            const bgGrad = ctx.createRadialGradient(w/2, h/2, 0, w/2, h/2, w * 0.48);
+            bgGrad.addColorStop(0, `hsla(${p.hue}, 90%, 35%, 0.7)`);
+            bgGrad.addColorStop(1, 'transparent');
+            ctx.fillStyle = bgGrad; ctx.fillRect(0, 0, w, h);
+
+            if (p.pattern === 'heart') {
+                const cx = w/2, cy = h/2;
+                const heartPath = (scale) => {
+                    ctx.beginPath();
+                    for (let t = 0; t <= Math.PI * 2 + 0.05; t += 0.04) {
+                        const x = 16 * Math.pow(Math.sin(t), 3);
+                        const y = -(13 * Math.cos(t) - 5*Math.cos(2*t) - 2*Math.cos(3*t) - Math.cos(4*t));
+                        const px = cx + x * scale, py = cy + y * scale;
+                        if (t === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py);
+                    }
+                    ctx.closePath();
+                };
+                ctx.globalAlpha = 0.95; ctx.fillStyle = '#ff66b2'; heartPath(13); ctx.fill();
+                ctx.globalAlpha = 1;
+            }
+            return cvs;
+        };
+    </script>
+
+    <!-- SCRIPT 1: LÓGICA DE LOGIN AISLADA PARA QUE NUNCA FALLE -->
+    <script>
+        const loginWrapper = document.getElementById('login-wrapper');
+        const loginScreen = document.getElementById('login-screen');
+        const nameInput = document.getElementById('name-input');
+        const btnEnter = document.getElementById('btn-enter');
+        const errorMsg = document.getElementById('error-msg');
+
+        function checkName() {
+            const input = nameInput.value.trim().toLowerCase();
+            const normalizedInput = input.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+            
+            if (normalizedInput === 'carlos') {
+                loginWrapper.style.opacity = '0';
+                loginScreen.style.transform = 'scale(0.8)';
+                setTimeout(() => {
+                    loginWrapper.style.visibility = 'hidden';
+                    try {
+                        startExperience();
+                    } catch (error) {
+                        alert("El navegador de tu iPhone está bloqueando los gráficos 3D (WebGL). Para verlo correctamente, ábrelo en Safari o pide que te envíen el link web.");
+                    }
+                }, 800);
+            } else {
+                errorMsg.style.display = 'block';
+                nameInput.value = '';
+                nameInput.focus();
+            }
+        }
+        btnEnter.addEventListener('click', checkName);
+        nameInput.addEventListener('keypress', e => { if (e.key === 'Enter') checkName(); });
+    </script>
+
+    <!-- SCRIPT 2: MOTOR 3D ENCAPSULADO -->
+    <script>
+        let experienceStarted = false;
+        let experienceStartMs = 0;
+
+        function startExperience() {
+            if (experienceStarted) return;
+            
+            // Verificación estricta para saber si el script externo fue bloqueado por iOS
+            if (typeof THREE === 'undefined') {
+                throw new Error("Librería WebGL bloqueada por políticas de seguridad de iOS");
+            }
+
+            experienceStarted = true;
+            experienceStartMs = performance.now();
+
+            const canvas = document.getElementById('bg-canvas');
+            const isMobile = window.innerWidth < 768;
+
+            const scene = new THREE.Scene();
+            scene.fog = new THREE.FogExp2(0x000000, 0.018);
+            const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 200);
+            camera.position.set(6, 4, 10);
+            scene.add(camera);
+
+            const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
+
+            const controls = new THREE.OrbitControls(camera, canvas);
+            controls.enableDamping = true; controls.enableZoom = true; controls.enablePan = true;
+            controls.zoomSpeed = 0.8; controls.rotateSpeed = 0.5; controls.dampingFactor = 0.06;
+
+            const parameters = {
+                count: isMobile ? 25000 : 70000, size: isMobile ? 0.025 : 0.017,
+                radius: 8, branches: 4, spin: 1, randomness: 0.3, randomnessPower: 3,
+                insideColor: '#ffb3d9', outsideColor: '#ff1493', jetCount: isMobile ? 2500 : 6000
+            };
+
+            let geometry, material, points, jetGeometry, jetMaterial, jetPoints, blackHoleMesh, accretionMesh, accretionMeshHalo, accretionPoints;
+            let jetVelocities = [];
+
+            const generateBlackHole = () => {
+                blackHoleMesh = new THREE.Mesh(new THREE.SphereGeometry(0.3, 32, 32), new THREE.MeshBasicMaterial({ color: 0x000000 }));
+                scene.add(blackHoleMesh);
+
+                accretionMesh = new THREE.Mesh(
+                    new THREE.RingGeometry(0.35, 0.85, 64, 8),
+                    new THREE.MeshBasicMaterial({ color: 0xff66b2, side: THREE.DoubleSide, transparent: true, opacity: 0.78, blending: THREE.AdditiveBlending })
+                );
+                accretionMesh.rotation.x = Math.PI / 2;
+                scene.add(accretionMesh);
+
+                accretionMeshHalo = new THREE.Mesh(
+                    new THREE.RingGeometry(0.32, 0.55, 64, 8),
+                    new THREE.MeshBasicMaterial({ color: 0xff1493, side: THREE.DoubleSide, transparent: true, opacity: 0.48, blending: THREE.AdditiveBlending })
+                );
+                accretionMeshHalo.rotation.y = Math.PI / 3;
+                scene.add(accretionMeshHalo);
+
+                const accParticlesCount = isMobile ? 2000 : 5000;
+                const accGeo = new THREE.BufferGeometry();
+                const accPos = new Float32Array(accParticlesCount * 3);
+                const accCol = new Float32Array(accParticlesCount * 3);
+                const baseColor = new THREE.Color(0xff66b2);
+                
+                for (let i = 0; i < accParticlesCount; i++) {
+                    const i3 = i * 3;
+                    const r = 0.32 + Math.random() * 0.45;
+                    const angle = Math.random() * Math.PI * 2;
+                    accPos[i3] = Math.cos(angle) * r; accPos[i3+1] = (Math.random()-0.5)*0.02; accPos[i3+2] = Math.sin(angle) * r;
+                    accCol[i3] = baseColor.r; accCol[i3+1] = baseColor.g; accCol[i3+2] = baseColor.b;
+                }
+                accGeo.setAttribute('position', new THREE.BufferAttribute(accPos, 3));
+                accGeo.setAttribute('color', new THREE.BufferAttribute(accCol, 3));
+                accretionPoints = new THREE.Points(accGeo, new THREE.PointsMaterial({ size: 0.014, vertexColors: true, blending: THREE.AdditiveBlending, depthWrite: false }));
+                scene.add(accretionPoints);
+            };
+
+            const generateGalaxy = () => {
+                geometry = new THREE.BufferGeometry();
+                const positions = new Float32Array(parameters.count * 3);
+                const colors    = new Float32Array(parameters.count * 3);
+                const colorInside  = new THREE.Color(parameters.insideColor);
+                const colorOutside = new THREE.Color(parameters.outsideColor);
+                
+                for (let i = 0; i < parameters.count; i++) {
+                    const i3 = i * 3;
+                    let radius = Math.random() * parameters.radius;
+                    if (radius < 1.2) radius += 1.2;
+                    const spinAngle   = radius * parameters.spin;
+                    const branchAngle = (i % parameters.branches) / parameters.branches * Math.PI * 2;
+                    const rX = Math.pow(Math.random(), parameters.randomnessPower) * (Math.random() < 0.5 ? 1 : -1) * parameters.randomness * radius;
+                    const rY = Math.pow(Math.random(), parameters.randomnessPower) * (Math.random() < 0.5 ? 1 : -1) * parameters.randomness * radius;
+                    const rZ = Math.pow(Math.random(), parameters.randomnessPower) * (Math.random() < 0.5 ? 1 : -1) * parameters.randomness * radius;
+                    
+                    positions[i3]   = Math.cos(branchAngle + spinAngle) * radius + rX;
+                    positions[i3+1] = rY / 2;
+                    positions[i3+2] = Math.sin(branchAngle + spinAngle) * radius + rZ;
+                    
+                    const mixedColor = colorInside.clone().lerp(colorOutside, radius / parameters.radius);
+                    colors[i3] = mixedColor.r; colors[i3+1] = mixedColor.g; colors[i3+2] = mixedColor.b;
+                }
+                geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+                geometry.setAttribute('color',    new THREE.BufferAttribute(colors, 3));
+                material = new THREE.PointsMaterial({ size: parameters.size, depthWrite: false, blending: THREE.AdditiveBlending, vertexColors: true });
+                points = new THREE.Points(geometry, material);
+                scene.add(points);
+            };
+
+            const heartPoint = (t) => ({
+                x: 16 * Math.pow(Math.sin(t), 3) * 0.13,
+                y: (13 * Math.cos(t) - 5*Math.cos(2*t) - 2*Math.cos(3*t) - Math.cos(4*t)) * 0.13
+            });
+            const insideHeart = (x, y) => {
+                const X = x / 1.2, Y = y / 1.2;
+                return Math.pow(X*X + Y*Y - 1, 3) - X*X * Y*Y*Y < 0;
+            };
+
+            const generateJet = () => {
+                jetGeometry = new THREE.BufferGeometry();
+                const positions = new Float32Array(parameters.jetCount * 3);
+                const colors    = new Float32Array(parameters.jetCount * 3);
+                jetVelocities = [];
+                const heartCenterY = 3.2;
+                let placed = 0;
+                
+                while (placed < parameters.jetCount) {
+                    const i3 = placed * 3;
+                    let px, py;
+                    if (Math.random() < 0.7) {
+                        const tParam = Math.random() * Math.PI * 2;
+                        const hp = heartPoint(tParam);
+                        const jitter = (Math.random() - 0.5) * 0.18;
+                        const len = Math.sqrt(hp.x*hp.x + hp.y*hp.y) + 0.001;
+                        px = hp.x + (hp.x / len) * jitter; py = hp.y + (hp.y / len) * jitter;
+                    } else {
+                        let attempts = 0;
+                        do { px = (Math.random()-0.5)*5; py = (Math.random()-0.5)*5+0.4; attempts++; if (attempts > 30) { px = 0; py = 0; break; } } while (!insideHeart(px, py));
+                    }
+                    const pz = (Math.random() - 0.5) * 0.4;
+                    positions[i3] = 0; positions[i3+1] = 0; positions[i3+2] = 0;
+                    
+                    jetVelocities.push({
+                        basePx: px, basePy: py + heartCenterY, basePz: pz,
+                        phase: Math.random() * Math.PI * 2, freq: 0.5 + Math.random() * 0.8, amp: 0.04 + Math.random() * 0.08,
+                        emergeDelay: Math.random() * 0.9, emergeDuration: 0.7 + Math.random() * 0.7
+                    });
+
+                    const tt = Math.random();
+                    colors[i3] = 1.0; 
+                    colors[i3+1] = 0.4 + tt * 0.2; 
+                    colors[i3+2] = 0.7 + tt * 0.3; 
+                    placed++;
+                }
+                jetGeometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+                jetGeometry.setAttribute('color',    new THREE.BufferAttribute(colors, 3));
+                jetMaterial = new THREE.PointsMaterial({ size: parameters.size * 2.5, depthWrite: false, blending: THREE.AdditiveBlending, vertexColors: true, transparent: true, opacity: 0.95 });
+                jetPoints = new THREE.Points(jetGeometry, jetMaterial);
+                scene.add(jetPoints);
+            };
+
+            const generateBgStars = () => {
+                const starGeo = new THREE.BufferGeometry();
+                const starCount = isMobile ? 1500 : 3500;
+                const starPos = new Float32Array(starCount * 3);
+                for (let i = 0; i < starCount; i++) {
+                    const i3 = i * 3;
+                    const r = 30 + Math.random() * 120;
+                    const theta = 2 * Math.PI * Math.random();
+                    const phi = Math.acos(2 * Math.random() - 1);
+                    starPos[i3] = r * Math.sin(phi) * Math.cos(theta);
+                    starPos[i3+1] = r * Math.sin(phi) * Math.sin(theta);
+                    starPos[i3+2] = r * Math.cos(phi);
+                }
+                starGeo.setAttribute('position', new THREE.BufferAttribute(starPos, 3));
+                scene.add(new THREE.Points(starGeo, new THREE.PointsMaterial({ color: 0xffdcf4, size: isMobile ? 0.07 : 0.04, transparent: true, opacity: 0.6, depthWrite: false })));
+            };
+
+            const plateGroup = new THREE.Group(); scene.add(plateGroup);
+            const plateMeshes = [];
+            window.plates.forEach((p, i) => {
+                const cvs = window.makePlateCanvas(p, i * 137, 512);
+                const tex = new THREE.CanvasTexture(cvs);
+                const mesh = new THREE.Mesh(new THREE.CircleGeometry(1.05 * 0.5, 64), new THREE.MeshBasicMaterial({ map: tex, transparent: true, side: THREE.DoubleSide, depthWrite: false }));
+                mesh.userData = { plate: p, index: i };
+                const ring = i % 2;
+                plateMeshes.push({ mesh, radius: ring === 0 ? 4.2 : 6.8, baseAngle: (Math.floor(i/2) / Math.ceil(window.plates.length/2)) * Math.PI*2, speed: ring === 0 ? 0.06 : -0.04, tilt: ring === 0 ? 0.15 : -0.2, yOffset: (ring === 0 ? 0.8 : -0.5) + Math.sin(i)*0.25, wobblePhase: i * 0.7 });
+                plateGroup.add(mesh);
+            });
+
+            generateBlackHole(); generateGalaxy(); generateJet(); generateBgStars();
+
+            if (points) points.visible = false;
+            [accretionMesh, accretionMeshHalo, accretionPoints, blackHoleMesh, jetPoints].forEach(o => { if (o) o.visible = false; });
+            plateMeshes.forEach(d => { d.mesh.visible = false; d.mesh.scale.set(0.001,0.001,0.001); });
+            camera.position.set(40, 25, 50);
+
+            const easeOutCubic = x => 1 - Math.pow(1 - x, 3);
+            const easeOutBack  = x => { const c = 1.70158; return 1 + (c+1) * Math.pow(x-1,3) + c * Math.pow(x-1,2); };
+
+            const tick = () => {
+                const t = (performance.now() - experienceStartMs) / 1000;
+
+                if (t < 9) {
+                    const p = easeOutCubic(Math.min(1, t / 9));
+                    camera.position.lerpVectors(new THREE.Vector3(40,25,50), new THREE.Vector3(3.5,2.5,6), p);
+                    controls.enabled = false;
+                } else {
+                    controls.enabled = true;
+                }
+
+                if (t > 0.8 && blackHoleMesh) {
+                    blackHoleMesh.visible = accretionMesh.visible = accretionMeshHalo.visible = accretionPoints.visible = true;
+                    const s = easeOutBack(Math.min(1, (t - 0.8) / 2.2));
+                    [blackHoleMesh, accretionMesh, accretionMeshHalo, accretionPoints].forEach(o => o.scale.setScalar(s));
+                }
+                if (t > 2.5 && points) {
+                    points.visible = true;
+                    points.rotation.y = t * 0.05;
+                    points.scale.setScalar(easeOutCubic(Math.min(1, (t - 2.5) / 4.5)));
+                }
+
+                if (t > 4.4 && jetPoints) {
+                    jetPoints.visible = true;
+                    const heartT = t - 4.4;
+                    const pos = jetPoints.geometry.attributes.position.array;
+                    for (let i = 0; i < parameters.jetCount; i++) {
+                        const i3 = i * 3, v = jetVelocities[i];
+                        const localT = heartT - v.emergeDelay;
+                        if (localT <= 0) continue;
+                        const p = Math.min(1, localT / v.emergeDuration);
+                        const eased = 1 - Math.pow(1 - p, 3);
+                        const beat = 1 + Math.sin(t * 2.2) * 0.04;
+                        const fx = v.basePx * beat + Math.cos(v.phase) * Math.sin(t * v.freq + v.phase) * v.amp * 0.3;
+                        const fy = (v.basePy - 3.2) * beat + 3.2;
+                        const fz = v.basePz + Math.sin(t * v.freq * 0.7 + v.phase) * 0.15;
+                        pos[i3] = fx * eased; pos[i3+1] = fy * eased + Math.sin(eased * Math.PI) * 0.6 * (1-eased); pos[i3+2] = fz * eased;
+                    }
+                    jetPoints.geometry.attributes.position.needsUpdate = true;
+                }
+
+                plateMeshes.forEach((d, i) => {
+                    if (t > 5.8 + i * 0.12) {
+                        d.mesh.visible = true;
+                        const localP = Math.min(1, (t - 5.8 - i * 0.12) / 1.8);
+                        const angle  = d.baseAngle + t * d.speed;
+                        d.mesh.position.set(Math.cos(angle) * d.radius, d.yOffset + Math.sin(t * 0.4 + d.wobblePhase) * 0.3 + Math.sin(angle) * d.tilt, Math.sin(angle) * d.radius);
+                        d.mesh.scale.setScalar(easeOutCubic(localP));
+                        d.mesh.lookAt(camera.position);
+                    }
+                });
+
+                controls.update();
+                renderer.render(scene, camera);
+                window.requestAnimationFrame(tick);
+            };
+            tick();
+
+            window.addEventListener('resize', () => {
+                camera.aspect = window.innerWidth / window.innerHeight; camera.updateProjectionMatrix();
+                renderer.setSize(window.innerWidth, window.innerHeight);
+            });
+
+            const raycaster = new THREE.Raycaster(); const pointer = new THREE.Vector2();
+            canvas.addEventListener('pointerup', e => {
+                if ((performance.now() - experienceStartMs)/1000 > 9) {
+                    pointer.x = (e.clientX / window.innerWidth) * 2 - 1; pointer.y = -(e.clientY / window.innerHeight) * 2 + 1;
+                    raycaster.setFromCamera(pointer, camera);
+                    const hits = raycaster.intersectObjects(plateMeshes.map(d => d.mesh).filter(m => m.visible), false);
+                    if (hits.length > 0) {
+                        document.getElementById('message-title').textContent = hits[0].object.userData.plate.name;
+                        document.getElementById('message-text').textContent  = hits[0].object.userData.plate.message;
+                        document.getElementById('message-image').src = window.makePlateCanvas(hits[0].object.userData.plate, hits[0].object.userData.index * 137, 512).toDataURL();
+                        document.getElementById('message-overlay').classList.add('show');
+                    }
+                }
+            });
+            document.getElementById('message-close').addEventListener('click', () => document.getElementById('message-overlay').classList.remove('show'));
+        }
+    </script>
+</body>
+</html>
