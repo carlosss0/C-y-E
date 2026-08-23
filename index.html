@@ -75,7 +75,7 @@
 
         /* ----- PANTALLA DEL RAMO (BOUQUET) ----- */
         #bouquet-overlay {
-            position: fixed; inset: 0; background: radial-gradient(circle, #061616, #000 65%);
+            position: fixed; inset: 0; background: radial-gradient(circle, #061616, #000 75%);
             z-index: 40; display: flex; flex-direction: column; align-items: center; justify-content: flex-start;
             opacity: 0; pointer-events: none; transition: opacity 1.5s ease;
         }
@@ -93,35 +93,39 @@
         @keyframes starsMove { to { background-position: 0 -500px, 150px -400px, -100px -300px; } }
 
         .bq-texts {
-            position: relative; z-index: 10; width: 90%; max-width: 600px;
-            text-align: center; margin-top: 8vh;
+            position: relative; z-index: 10; width: 95%; max-width: 700px;
+            text-align: center; margin-top: 6vh;
         }
         .bq-line {
-            font-size: clamp(16px, 4.5vw, 22px); margin-bottom: 12px; opacity: 0;
-            text-shadow: 0 0 10px rgba(255,255,255,0.5); animation: bqFade 1.5s forwards;
-            font-family: 'Georgia', serif; font-style: italic;
+            font-size: clamp(20px, 5vw, 28px); /* Letra más grande */
+            margin-bottom: 15px; opacity: 0;
+            color: #a8f7ff; /* Azul claro estilo la rosa iris */
+            text-shadow: 0 0 10px rgba(168,247,255,0.7), 0 0 20px rgba(100,88,255,0.5); /* Brillo azulado */
+            animation: bqFade 1.5s forwards;
+            font-family: 'Georgia', serif; font-style: italic; font-weight: bold;
         }
         .bq-line.final {
-            font-size: clamp(24px, 7vw, 36px); font-weight: bold; color: #ff66b2;
-            text-shadow: 0 0 15px #ff66b2, 0 0 30px #ff1493; margin-top: 25px;
-            font-style: normal;
+            font-size: clamp(28px, 8vw, 42px); font-weight: bold; color: #ff66b2;
+            text-shadow: 0 0 15px #ff66b2, 0 0 30px #ff1493; margin-top: 30px;
+            font-style: normal; letter-spacing: 0.05em;
         }
         @keyframes bqFade { to { opacity: 1; transform: translateY(0); } from { transform: translateY(15px); } }
 
         .bouquet {
-            position: absolute; bottom: 0; width: 100%; max-width: 400px; height: 50vh; min-height: 400px;
-            z-index: 2; transform: scale(0.9); animation: rise 2.5s ease forwards;
+            position: absolute; bottom: 0; width: 100%; max-width: 500px; height: 50vh; min-height: 450px;
+            z-index: 2; transform: scale(0.9); animation: rise 3s ease forwards;
         }
-        @keyframes rise { from { opacity: 0; transform: translateY(150px) scale(0.7); } to { opacity: 1; transform: translateY(0) scale(0.9); } }
+        @keyframes rise { from { opacity: 0; transform: translateY(200px) scale(0.7); } to { opacity: 1; transform: translateY(0) scale(0.9); } }
 
-        .flower { position: absolute; transform-origin: bottom center; animation: sway 3s ease-in-out infinite alternate; }
-        @keyframes sway { from { transform: rotate(var(--r)); } to { transform: rotate(calc(var(--r) + 4deg)); } }
+        .flower { position: absolute; transform-origin: bottom center; animation: sway 3.5s ease-in-out infinite alternate; }
+        @keyframes sway { from { transform: rotate(var(--r)); } to { transform: rotate(calc(var(--r) + 5deg)); } }
 
-        .stem { width: 8px; height: 330px; background: linear-gradient(#8fffff, #087979); border-radius: 20px; box-shadow: 0 0 15px cyan; }
+        .stem { width: 8px; height: 350px; background: linear-gradient(#8fffff, #087979); border-radius: 20px; box-shadow: 0 0 15px cyan; }
         .leaf { position: absolute; width: 45px; height: 85px; background: linear-gradient(135deg, #68ffff, #0b7777); border-radius: 100% 0 100% 0; box-shadow: 0 0 12px cyan; }
         .leaf.left { top: 170px; left: -42px; transform: rotate(-35deg); }
         .leaf.right { top: 230px; left: 5px; transform: rotate(40deg) scaleX(-1); }
 
+        /* Rosa Azul */
         .iris-head { position: absolute; top: -55px; left: -45px; width: 100px; height: 100px; }
         .iris-head span { position: absolute; width: 55px; height: 78px; background: linear-gradient(#fff, #a8f7ff, #6458ff); border-radius: 60% 60% 25% 60%; box-shadow: 0 0 15px white, 0 0 35px cyan; }
         .iris-head span:nth-child(1) { left: 22px; top: 0; }
@@ -129,13 +133,14 @@
         .iris-head span:nth-child(3) { right: 0; top: 30px; transform: rotate(55deg); }
         .center { position: absolute; width: 32px; height: 13px; background: #fff59d; border-radius: 50%; top: 58px; left: 34px; box-shadow: 0 0 15px yellow; }
 
+        /* Rosa Rosa */
         .tulip-head { position: absolute; top: -58px; left: -35px; width: 80px; height: 85px; }
         .tulip-head span { position: absolute; bottom: 0; width: 45px; height: 75px; background: linear-gradient(#fff, #ffc2ef, #ff4fc3); border-radius: 50% 50% 15% 15%; box-shadow: 0 0 15px white, 0 0 30px #ff8be0; }
         .tulip-head span:nth-child(1) { left: 17px; z-index: 2; }
         .tulip-head span:nth-child(2) { left: 0; transform: rotate(-25deg); }
         .tulip-head span:nth-child(3) { right: 0; transform: rotate(25deg); }
         
-        #btn-volver { position: absolute; top: 20px; right: 20px; z-index: 50; background: rgba(255,255,255,0.1); border: 1px solid cyan; color: cyan; padding: 8px 15px; border-radius: 20px; cursor: pointer; opacity: 0; animation: bqFade 1s forwards 12s; }
+        #btn-volver { position: absolute; top: 20px; right: 20px; z-index: 50; background: rgba(255,255,255,0.1); border: 1px solid cyan; color: cyan; padding: 8px 15px; border-radius: 20px; cursor: pointer; opacity: 0; animation: bqFade 1s forwards 22s; }
     </style>
 </head>
 <body>
@@ -165,17 +170,17 @@
         </div>
     </div>
 
-    <!-- NUEVA PANTALLA DE LA DECLARACIÓN (RAMO) -->
+    <!-- PANTALLA DE LA DECLARACIÓN (RAMO) -->
     <div id="bouquet-overlay">
         <div class="stars"></div>
         <button id="btn-volver" onclick="closeBouquet()">Volver</button>
         
         <div class="bq-texts" id="bq-texts-container">
-            <!-- Los textos se inyectan con JS para reiniciar la animación -->
+            <!-- Textos inyectados por JS -->
         </div>
         
         <div class="bouquet" id="bouquet-container">
-            <!-- Las 16 flores se inyectan con JS -->
+            <!-- 32 flores inyectadas por JS -->
         </div>
     </div>
 
@@ -232,30 +237,35 @@
     </script>
 
     <script>
-        // ----- FUNCIONES DEL RAMO -----
+        // ----- FUNCIONES DEL RAMO (32 ROSAS Y TEXTOS MEJORADOS) -----
         function buildBouquet() {
             const bq = document.getElementById('bouquet-container');
             const txt = document.getElementById('bq-texts-container');
             
-            // Inyectamos textos con retrasos escalonados
+            // Textos súper románticos con tiempos de lectura adecuados
             txt.innerHTML = `
-                <div class="bq-line" style="animation-delay: 1.5s;">Me haces muy feliz,</div>
-                <div class="bq-line" style="animation-delay: 4.0s;">desde la primera vez que nos vimos todo es mejor,</div>
-                <div class="bq-line" style="animation-delay: 6.5s;">gracias por todo y por aguantarme mis enojos jaja.</div>
-                <div class="bq-line" style="animation-delay: 9.0s;">Te amo mucho,</div>
-                <div class="bq-line" style="animation-delay: 11.0s;">estoy seguro que eres el amor de mi vida por eso...</div>
-                <div class="bq-line final" style="animation-delay: 14.5s;">Estefany, ¿quieres ser mi novia?</div>
+                <div class="bq-line" style="animation-delay: 1.5s;">Me haces inmensamente feliz...</div>
+                <div class="bq-line" style="animation-delay: 4.5s;">Desde la primera vez que te vi, mi mundo se volvió mucho mejor.</div>
+                <div class="bq-line" style="animation-delay: 8.5s;">Gracias por ser mi paz y por aguantar mis enojos jaja.</div>
+                <div class="bq-line" style="animation-delay: 12.5s;">Te amo con todo mi corazón,</div>
+                <div class="bq-line" style="animation-delay: 15.5s;">y estoy seguro de que eres el amor de mi vida.</div>
+                <div class="bq-line" style="animation-delay: 19.0s;">Por eso...</div>
+                <div class="bq-line final" style="animation-delay: 21.5s;">Estefany, ¿quieres ser mi novia?</div>
             `;
 
-            // Construir matemáticamente 16 rosas para el ramo
+            // Construir matemáticamente 32 rosas para un ramo gigante
             let html = '';
-            for(let i = 0; i < 16; i++) {
-                const isTulip = i % 2 === 0; // Mitad y mitad
-                const pct = i / 15; // De 0 a 1
-                const left = 35 + (pct * 30); // Se agrupan del 35% al 65% de la base
-                const rot = -40 + (pct * 80); // Se abren de -40 a +40 grados
-                const bottomOffset = 10 + (i % 3) * 15; // Pequeños desniveles en la altura
-                const animDelay = (Math.random() * -3).toFixed(2); // Desfase aleatorio para el movimiento
+            for(let i = 0; i < 32; i++) {
+                const isTulip = i % 2 === 0; // Alternar colores
+                const pct = i / 31; // De 0 a 1
+                
+                // Distribución más ancha para que quepan las 32 rosas
+                const left = 15 + (pct * 70); 
+                const rot = -50 + (pct * 100); 
+                
+                // Alturas variadas para darle volumen 3D
+                const bottomOffset = 5 + (Math.random() * 40); 
+                const animDelay = (Math.random() * -3).toFixed(2); 
                 
                 html += `
                 <div class="flower" style="left: ${left}%; bottom: ${bottomOffset}px; --r: ${rot}deg; animation-delay: ${animDelay}s;">
@@ -273,7 +283,7 @@
 
         function closeBouquet() {
             document.getElementById('bouquet-overlay').classList.remove('show');
-            document.getElementById('bouquet-container').innerHTML = ''; // Limpiar para que la animación se reinicie si vuelven a entrar
+            document.getElementById('bouquet-container').innerHTML = ''; 
         }
 
         // ----- LOGIN -----
@@ -566,7 +576,7 @@
                     tilt: ring === 0 ? 0.15 : -0.2, 
                     yOffset: (ring === 0 ? 0.8 : -0.5) + Math.sin(i)*0.25, 
                     wobblePhase: i * 0.7,
-                    isSpidey: p.isSpidey // Identificador para la escala
+                    isSpidey: p.isSpidey 
                 });
                 plateGroup.add(mesh);
             });
@@ -638,7 +648,6 @@
                         const angle  = d.baseAngle + t * d.speed;
                         d.mesh.position.set(Math.cos(angle) * d.radius, d.yOffset + Math.sin(t * 0.4 + d.wobblePhase) * 0.3 + Math.sin(angle) * d.tilt, Math.sin(angle) * d.radius);
                         
-                        // HACEMOS A SPIDERMAN MÁS GRANDE (El doble)
                         const baseScale = d.isSpidey ? 2.2 : 1.0; 
                         d.mesh.scale.setScalar(easeOutCubic(localP) * baseScale);
                         
@@ -666,12 +675,10 @@
                     if (hits.length > 0) {
                         const plate = hits[0].object.userData.plate;
                         
-                        // LÓGICA DE SPIDERMAN -> ACTIVA EL RAMO DE FLORES
                         if (plate.isSpidey) {
                             document.getElementById('bouquet-overlay').classList.add('show');
                             buildBouquet(); 
                         } else {
-                            // FOTOS NORMALES
                             document.getElementById('message-title').textContent = plate.name;
                             
                             const src = plate.src;
