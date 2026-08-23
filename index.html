@@ -92,17 +92,16 @@
         }
         @keyframes starsMove { to { background-position: 0 -500px, 150px -400px, -100px -300px; } }
 
-        /* Contenedor de Textos Interactivos */
+        /* Contenedor de Textos Interactivos Ajustado */
         .bq-texts {
             position: relative; z-index: 10; width: 95%; max-width: 700px;
-            text-align: center; margin-top: 6vh;
+            text-align: center; margin-top: 3vh; /* Subido para dar espacio al ramo */
         }
         .bq-line {
-            font-size: clamp(22px, 5.5vw, 30px); margin-bottom: 15px; 
+            font-size: clamp(20px, 5vw, 28px); margin-bottom: 10px; /* Letras compactadas */
             color: #a8f7ff; text-shadow: 0 0 10px rgba(168,247,255,0.7), 0 0 20px rgba(100,88,255,0.5); 
             font-family: 'Georgia', serif; font-style: italic; font-weight: bold;
-            display: none; /* Ocultas por defecto */
-            opacity: 0;
+            display: none; opacity: 0;
         }
         .bq-line.visible {
             display: block;
@@ -110,14 +109,14 @@
         }
         .bq-line.final {
             font-size: clamp(28px, 8vw, 42px); font-weight: bold; color: #ff66b2;
-            text-shadow: 0 0 15px #ff66b2, 0 0 30px #ff1493; margin-top: 30px;
+            text-shadow: 0 0 15px #ff66b2, 0 0 30px #ff1493; margin-top: 20px;
             font-style: normal; letter-spacing: 0.05em;
         }
         @keyframes bqFade { to { opacity: 1; transform: translateY(0); } from { transform: translateY(15px); } }
 
         /* Hint (Toca para continuar) */
         #tap-hint {
-            position: absolute; bottom: 25px; left: 50%; transform: translateX(-50%);
+            position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%);
             font-size: 14px; color: rgba(255,255,255,0.6); pointer-events: none;
             animation: hintPulse 2s infinite; z-index: 50; display: none;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -125,12 +124,13 @@
         }
         @keyframes hintPulse { 0%, 100% { opacity: 0.3; } 50% { opacity: 1; } }
 
-        /* Ramo ajustado y subido */
+        /* Ramo ajustado: Más abajo y ligeramente escalado */
         .bouquet {
-            position: absolute; bottom: 5vh; width: 100%; max-width: 600px; height: 50vh; min-height: 450px;
-            z-index: 2; transform: scale(0.9); animation: rise 2.5s ease forwards;
+            position: absolute; bottom: -8vh; /* Se empuja hacia abajo para no chocar */
+            width: 100%; max-width: 600px; height: 50vh; min-height: 450px;
+            z-index: 2; transform: scale(0.85); animation: rise 2.5s ease forwards;
         }
-        @keyframes rise { from { opacity: 0; transform: translateY(200px) scale(0.7); } to { opacity: 1; transform: translateY(0) scale(0.9); } }
+        @keyframes rise { from { opacity: 0; transform: translateY(200px) scale(0.7); } to { opacity: 1; transform: translateY(0) scale(0.85); } }
 
         .flower { position: absolute; transform-origin: bottom center; animation: sway 3.5s ease-in-out infinite alternate; }
         @keyframes sway { from { transform: rotate(var(--r)); } to { transform: rotate(calc(var(--r) + 5deg)); } }
@@ -160,7 +160,6 @@
 
     <canvas id="bg-canvas"></canvas>
 
-    <!-- PANTALLA DE LOGIN -->
     <div id="login-wrapper">
         <div id="login-screen">
             <h2>¿Nombre del amor de tu vida?</h2>
@@ -171,7 +170,6 @@
         </div>
     </div>
 
-    <!-- MODAL PARA LAS FOTOS -->
     <div id="message-overlay">
         <div id="message-card">
             <div id="message-image-wrap" id="img-container">
@@ -183,8 +181,6 @@
         </div>
     </div>
 
-    <!-- PANTALLA DE LA DECLARACIÓN (RAMO) -->
-    <!-- Agregamos el onclick al contenedor principal para que funcione el Tap -->
     <div id="bouquet-overlay" onclick="advanceText(event)">
         <div class="stars"></div>
         <button id="btn-volver" onclick="closeBouquet(event)">Volver</button>
@@ -194,7 +190,7 @@
         </div>
         
         <div class="bouquet" id="bouquet-container">
-            <!-- 32 flores inyectadas por JS -->
+            <!-- Flores inyectadas por JS -->
         </div>
 
         <div id="tap-hint">Toca la pantalla para continuar...</div>
@@ -253,7 +249,6 @@
     </script>
 
     <script>
-        // ----- LÓGICA DEL RAMO INTERACTIVO -----
         let currentLine = 0;
         let bouquetLines = [];
 
@@ -261,7 +256,6 @@
             const bq = document.getElementById('bouquet-container');
             const txt = document.getElementById('bq-texts-container');
             
-            // Textos en azul gigante (el último en rosa)
             txt.innerHTML = `
                 <div class="bq-line">Quiero decirte que me haces muy feliz,</div>
                 <div class="bq-line">desde la primera vez que te vi, todo es mucho mejor.</div>
@@ -272,19 +266,18 @@
                 <div class="bq-line final">Estefany, ¿quieres ser mi novia?</div>
             `;
 
-            // Construcción matemática del Ramo Extendido (32 Flores)
             let html = '';
             for(let i = 0; i < 32; i++) {
                 const isTulip = i % 2 === 0; 
-                const pct = i / 31; // De 0 a 1
+                const pct = i / 31; 
                 
-                // Distribución ancha del 5% al 95% para llenar la pantalla
-                const left = 5 + (pct * 90); 
-                const rot = -45 + (pct * 90); 
+                // Distribución EN ABANICO mucho más separada
+                const left = -10 + (pct * 120); 
+                const rot = -65 + (pct * 130); 
                 
-                // Función Seno para crear un arco real (más alto al centro)
+                // Arco pronunciado para que las de en medio suban y las orillas bajen
                 const archHeight = Math.sin(pct * Math.PI); 
-                const bottomOffset = 10 + (archHeight * 80) + (Math.random() * 25); 
+                const bottomOffset = -20 + (archHeight * 120) + (Math.random() * 20); 
                 
                 const animDelay = (Math.random() * -3).toFixed(2); 
                 
@@ -301,28 +294,22 @@
             }
             bq.innerHTML = html;
 
-            // Preparamos la interacción
             currentLine = 0;
             bouquetLines = document.querySelectorAll('.bq-line');
             
-            // Esperamos a que suba el ramo para mostrar el indicador
             setTimeout(() => {
                 document.getElementById('tap-hint').style.display = 'block';
-                // Mostramos la primera línea automáticamente
                 advanceText({ target: {} }); 
             }, 2000);
         }
 
-        // Se ejecuta cada vez que el usuario da click/tap en la pantalla del ramo
         function advanceText(e) {
-            // Ignoramos si tocó el botón volver
             if (e.target.id === 'btn-volver') return;
 
             if (currentLine < bouquetLines.length) {
                 bouquetLines[currentLine].classList.add('visible');
                 currentLine++;
                 
-                // Si llegamos a la última (la pregunta), ocultamos el hint
                 if (currentLine === bouquetLines.length) {
                     document.getElementById('tap-hint').style.display = 'none';
                 }
@@ -330,13 +317,12 @@
         }
 
         function closeBouquet(e) {
-            e.stopPropagation(); // Evita que se dispare advanceText
+            e.stopPropagation(); 
             document.getElementById('bouquet-overlay').classList.remove('show');
             document.getElementById('bouquet-container').innerHTML = ''; 
             document.getElementById('tap-hint').style.display = 'none';
         }
 
-        // ----- LOGIN -----
         const loginWrapper = document.getElementById('login-wrapper');
         const loginScreen = document.getElementById('login-screen');
         const nameInput = document.getElementById('name-input');
