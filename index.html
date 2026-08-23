@@ -136,10 +136,11 @@
             ctx.clearRect(0, 0, w, h);
             const bgGrad = ctx.createRadialGradient(w/2, h/2, 0, w/2, h/2, w * 0.48);
             
-            // Validación de seguridad para evitar caídas de WebGL
-            const hue = p.hue !== undefined ? p.hue : 0; 
-            bgGrad.addColorStop(0, `hsla(${hue}, 90%, 35%, 0.7)`);
+            // CORRECCIÓN DE SEGURIDAD: Evita valores undefined
+            const hueValue = p.hue !== undefined ? p.hue : 350;
+            bgGrad.addColorStop(0, `hsla(${hueValue}, 90%, 35%, 0.7)`);
             bgGrad.addColorStop(1, 'transparent');
+            
             ctx.fillStyle = bgGrad; ctx.fillRect(0, 0, w, h);
 
             if (p.pattern === 'heart') {
@@ -177,7 +178,12 @@
                 loginScreen.style.transform = 'scale(0.8)';
                 setTimeout(() => {
                     loginWrapper.style.visibility = 'hidden';
-                    startExperience(); 
+                    try { 
+                        startExperience(); 
+                    } catch (error) {
+                        console.error(error);
+                        alert("Error de WebGL o de carga de red: " + error.message);
+                    }
                 }, 800);
             } else {
                 errorMsg.style.display = 'block';
@@ -196,8 +202,7 @@
         function startExperience() {
             if (experienceStarted) return;
             if (typeof THREE === 'undefined') {
-                console.error("Three.js no ha cargado correctamente.");
-                return;
+                throw new Error("La librería de gráficos 3D no se descargó correctamente.");
             }
 
             experienceStarted = true;
