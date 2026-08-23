@@ -92,17 +92,21 @@
         }
         @keyframes starsMove { to { background-position: 0 -500px, 150px -400px, -100px -300px; } }
 
+        /* Contenedor de Textos Interactivos */
         .bq-texts {
             position: relative; z-index: 10; width: 95%; max-width: 700px;
             text-align: center; margin-top: 6vh;
         }
         .bq-line {
-            font-size: clamp(20px, 5vw, 28px); /* Letra más grande */
-            margin-bottom: 15px; opacity: 0;
-            color: #a8f7ff; /* Azul claro estilo la rosa iris */
-            text-shadow: 0 0 10px rgba(168,247,255,0.7), 0 0 20px rgba(100,88,255,0.5); /* Brillo azulado */
-            animation: bqFade 1.5s forwards;
+            font-size: clamp(22px, 5.5vw, 30px); margin-bottom: 15px; 
+            color: #a8f7ff; text-shadow: 0 0 10px rgba(168,247,255,0.7), 0 0 20px rgba(100,88,255,0.5); 
             font-family: 'Georgia', serif; font-style: italic; font-weight: bold;
+            display: none; /* Ocultas por defecto */
+            opacity: 0;
+        }
+        .bq-line.visible {
+            display: block;
+            animation: bqFade 1s forwards;
         }
         .bq-line.final {
             font-size: clamp(28px, 8vw, 42px); font-weight: bold; color: #ff66b2;
@@ -111,9 +115,20 @@
         }
         @keyframes bqFade { to { opacity: 1; transform: translateY(0); } from { transform: translateY(15px); } }
 
+        /* Hint (Toca para continuar) */
+        #tap-hint {
+            position: absolute; bottom: 25px; left: 50%; transform: translateX(-50%);
+            font-size: 14px; color: rgba(255,255,255,0.6); pointer-events: none;
+            animation: hintPulse 2s infinite; z-index: 50; display: none;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            white-space: nowrap;
+        }
+        @keyframes hintPulse { 0%, 100% { opacity: 0.3; } 50% { opacity: 1; } }
+
+        /* Ramo ajustado y subido */
         .bouquet {
-            position: absolute; bottom: 0; width: 100%; max-width: 500px; height: 50vh; min-height: 450px;
-            z-index: 2; transform: scale(0.9); animation: rise 3s ease forwards;
+            position: absolute; bottom: 5vh; width: 100%; max-width: 600px; height: 50vh; min-height: 450px;
+            z-index: 2; transform: scale(0.9); animation: rise 2.5s ease forwards;
         }
         @keyframes rise { from { opacity: 0; transform: translateY(200px) scale(0.7); } to { opacity: 1; transform: translateY(0) scale(0.9); } }
 
@@ -125,7 +140,6 @@
         .leaf.left { top: 170px; left: -42px; transform: rotate(-35deg); }
         .leaf.right { top: 230px; left: 5px; transform: rotate(40deg) scaleX(-1); }
 
-        /* Rosa Azul */
         .iris-head { position: absolute; top: -55px; left: -45px; width: 100px; height: 100px; }
         .iris-head span { position: absolute; width: 55px; height: 78px; background: linear-gradient(#fff, #a8f7ff, #6458ff); border-radius: 60% 60% 25% 60%; box-shadow: 0 0 15px white, 0 0 35px cyan; }
         .iris-head span:nth-child(1) { left: 22px; top: 0; }
@@ -133,14 +147,13 @@
         .iris-head span:nth-child(3) { right: 0; top: 30px; transform: rotate(55deg); }
         .center { position: absolute; width: 32px; height: 13px; background: #fff59d; border-radius: 50%; top: 58px; left: 34px; box-shadow: 0 0 15px yellow; }
 
-        /* Rosa Rosa */
         .tulip-head { position: absolute; top: -58px; left: -35px; width: 80px; height: 85px; }
         .tulip-head span { position: absolute; bottom: 0; width: 45px; height: 75px; background: linear-gradient(#fff, #ffc2ef, #ff4fc3); border-radius: 50% 50% 15% 15%; box-shadow: 0 0 15px white, 0 0 30px #ff8be0; }
         .tulip-head span:nth-child(1) { left: 17px; z-index: 2; }
         .tulip-head span:nth-child(2) { left: 0; transform: rotate(-25deg); }
         .tulip-head span:nth-child(3) { right: 0; transform: rotate(25deg); }
         
-        #btn-volver { position: absolute; top: 20px; right: 20px; z-index: 50; background: rgba(255,255,255,0.1); border: 1px solid cyan; color: cyan; padding: 8px 15px; border-radius: 20px; cursor: pointer; opacity: 0; animation: bqFade 1s forwards 22s; }
+        #btn-volver { position: absolute; top: 20px; right: 20px; z-index: 50; background: rgba(255,255,255,0.1); border: 1px solid cyan; color: cyan; padding: 8px 15px; border-radius: 20px; cursor: pointer; }
     </style>
 </head>
 <body>
@@ -158,7 +171,7 @@
         </div>
     </div>
 
-    <!-- MODAL PARA LAS FOTOS DE LOS CORAZONES -->
+    <!-- MODAL PARA LAS FOTOS -->
     <div id="message-overlay">
         <div id="message-card">
             <div id="message-image-wrap" id="img-container">
@@ -171,9 +184,10 @@
     </div>
 
     <!-- PANTALLA DE LA DECLARACIÓN (RAMO) -->
-    <div id="bouquet-overlay">
+    <!-- Agregamos el onclick al contenedor principal para que funcione el Tap -->
+    <div id="bouquet-overlay" onclick="advanceText(event)">
         <div class="stars"></div>
-        <button id="btn-volver" onclick="closeBouquet()">Volver</button>
+        <button id="btn-volver" onclick="closeBouquet(event)">Volver</button>
         
         <div class="bq-texts" id="bq-texts-container">
             <!-- Textos inyectados por JS -->
@@ -182,6 +196,8 @@
         <div class="bouquet" id="bouquet-container">
             <!-- 32 flores inyectadas por JS -->
         </div>
+
+        <div id="tap-hint">Toca la pantalla para continuar...</div>
     </div>
 
     <script id="plate-gen">
@@ -237,34 +253,39 @@
     </script>
 
     <script>
-        // ----- FUNCIONES DEL RAMO (32 ROSAS Y TEXTOS MEJORADOS) -----
+        // ----- LÓGICA DEL RAMO INTERACTIVO -----
+        let currentLine = 0;
+        let bouquetLines = [];
+
         function buildBouquet() {
             const bq = document.getElementById('bouquet-container');
             const txt = document.getElementById('bq-texts-container');
             
-            // Textos súper románticos con tiempos de lectura adecuados
+            // Textos en azul gigante (el último en rosa)
             txt.innerHTML = `
-                <div class="bq-line" style="animation-delay: 1.5s;">Me haces inmensamente feliz...</div>
-                <div class="bq-line" style="animation-delay: 4.5s;">Desde la primera vez que te vi, mi mundo se volvió mucho mejor.</div>
-                <div class="bq-line" style="animation-delay: 8.5s;">Gracias por ser mi paz y por aguantar mis enojos jaja.</div>
-                <div class="bq-line" style="animation-delay: 12.5s;">Te amo con todo mi corazón,</div>
-                <div class="bq-line" style="animation-delay: 15.5s;">y estoy seguro de que eres el amor de mi vida.</div>
-                <div class="bq-line" style="animation-delay: 19.0s;">Por eso...</div>
-                <div class="bq-line final" style="animation-delay: 21.5s;">Estefany, ¿quieres ser mi novia?</div>
+                <div class="bq-line">Quiero decirte que me haces muy feliz,</div>
+                <div class="bq-line">desde la primera vez que te vi, todo es mucho mejor.</div>
+                <div class="bq-line">Gracias por ser mi paz y por aguantar mis enojos jaja.</div>
+                <div class="bq-line">Te amo con todo mi corazón,</div>
+                <div class="bq-line">y estoy seguro de que eres el amor de mi vida.</div>
+                <div class="bq-line">Y porque ya no me imagino mis días sin ti...</div>
+                <div class="bq-line final">Estefany, ¿quieres ser mi novia?</div>
             `;
 
-            // Construir matemáticamente 32 rosas para un ramo gigante
+            // Construcción matemática del Ramo Extendido (32 Flores)
             let html = '';
             for(let i = 0; i < 32; i++) {
-                const isTulip = i % 2 === 0; // Alternar colores
+                const isTulip = i % 2 === 0; 
                 const pct = i / 31; // De 0 a 1
                 
-                // Distribución más ancha para que quepan las 32 rosas
-                const left = 15 + (pct * 70); 
-                const rot = -50 + (pct * 100); 
+                // Distribución ancha del 5% al 95% para llenar la pantalla
+                const left = 5 + (pct * 90); 
+                const rot = -45 + (pct * 90); 
                 
-                // Alturas variadas para darle volumen 3D
-                const bottomOffset = 5 + (Math.random() * 40); 
+                // Función Seno para crear un arco real (más alto al centro)
+                const archHeight = Math.sin(pct * Math.PI); 
+                const bottomOffset = 10 + (archHeight * 80) + (Math.random() * 25); 
+                
                 const animDelay = (Math.random() * -3).toFixed(2); 
                 
                 html += `
@@ -279,11 +300,40 @@
                 </div>`;
             }
             bq.innerHTML = html;
+
+            // Preparamos la interacción
+            currentLine = 0;
+            bouquetLines = document.querySelectorAll('.bq-line');
+            
+            // Esperamos a que suba el ramo para mostrar el indicador
+            setTimeout(() => {
+                document.getElementById('tap-hint').style.display = 'block';
+                // Mostramos la primera línea automáticamente
+                advanceText({ target: {} }); 
+            }, 2000);
         }
 
-        function closeBouquet() {
+        // Se ejecuta cada vez que el usuario da click/tap en la pantalla del ramo
+        function advanceText(e) {
+            // Ignoramos si tocó el botón volver
+            if (e.target.id === 'btn-volver') return;
+
+            if (currentLine < bouquetLines.length) {
+                bouquetLines[currentLine].classList.add('visible');
+                currentLine++;
+                
+                // Si llegamos a la última (la pregunta), ocultamos el hint
+                if (currentLine === bouquetLines.length) {
+                    document.getElementById('tap-hint').style.display = 'none';
+                }
+            }
+        }
+
+        function closeBouquet(e) {
+            e.stopPropagation(); // Evita que se dispare advanceText
             document.getElementById('bouquet-overlay').classList.remove('show');
             document.getElementById('bouquet-container').innerHTML = ''; 
+            document.getElementById('tap-hint').style.display = 'none';
         }
 
         // ----- LOGIN -----
@@ -325,9 +375,7 @@
 
         function startExperience() {
             if (experienceStarted) return;
-            if (typeof THREE === 'undefined') {
-                throw new Error("La librería de gráficos 3D no se descargó correctamente.");
-            }
+            if (typeof THREE === 'undefined') throw new Error("La librería de gráficos 3D no se descargó correctamente.");
 
             experienceStarted = true;
             experienceStartMs = performance.now();
