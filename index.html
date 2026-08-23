@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Galaxy Love</title>
 
+    <!-- Librerías Three.js estables -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
 
@@ -66,7 +67,7 @@
         #message-image { position: relative; z-index: 1; max-width: 100%; height: 100%; object-fit: contain; border-radius: 12px; }
         @keyframes floaty { 0%, 100% { transform: translateY(0); } 50%  { transform: translateY(-10px); } }
         
-        #message-title { font-size: 32px; font-weight: 700; color: #fff; margin: 0 0 30px; letter-spacing: 0.05em; text-shadow: 0 0 20px rgba(255,102,178,0.7); font-style: italic; }
+        #message-title { font-size: 28px; font-weight: 700; color: #fff; margin: 0 0 30px; letter-spacing: 0.05em; text-shadow: 0 0 20px rgba(255,102,178,0.7); font-style: italic; }
         
         #message-close { background: transparent; border: 1px solid rgba(255,102,178,0.5); color: rgba(255,220,230,0.9); padding: 10px 28px; font-size: 12px; letter-spacing: 0.2em; border-radius: 999px; cursor: pointer; transition: all 0.3s; }
         #message-close:hover { background: rgba(255,102,178,0.5); color: #fff; }
@@ -88,7 +89,7 @@
 
     <div id="message-overlay">
         <div id="message-card">
-            <div id="message-image-wrap" id="img-container">
+            <div id="message-image-wrap">
                 <img id="message-image-bg" src="" alt="" aria-hidden="true" crossorigin="anonymous">
                 <img id="message-image" src="" alt="" crossorigin="anonymous">
             </div>
@@ -98,14 +99,13 @@
     </div>
 
     <script id="plate-gen">
-        // 5 Corazones con foto + 1 Spiderman = 6 Elementos
         window.plates = [
             { "name": "El amor de mi vida", "src": "imagen1.jpeg", "hue": 355, "pattern": "heart" },
             { "name": "Mi todo", "src": "imagen2.jpeg", "hue": 0, "pattern": "heart" },
             { "name": "La niña de mis ojos", "src": "imagen3.jpeg", "hue": 350, "pattern": "heart" },
             { "name": "Mi universo entero", "src": "imagen4.jpeg", "hue": 358, "pattern": "heart" },
             { "name": "TE AMO", "src": "imagen5.jpeg", "hue": 355, "pattern": "heart" },
-            { "name": "Spidey", "icon": "spiderman.png", "isSpidey": true } // Usar .png real
+            { "name": "Spidey", "icon": "spiderman.png", "isSpidey": true }
         ];
 
         function mulberry32(a) {
@@ -164,9 +164,7 @@
                 loginScreen.style.transform = 'scale(0.8)';
                 setTimeout(() => {
                     loginWrapper.style.visibility = 'hidden';
-                    try { startExperience(); } catch (error) {
-                        alert("El navegador está bloqueando WebGL. Ábrelo nativamente en Safari o Chrome.");
-                    }
+                    startExperience();
                 }, 800);
             } else {
                 errorMsg.style.display = 'block';
@@ -184,8 +182,6 @@
 
         function startExperience() {
             if (experienceStarted) return;
-            if (typeof THREE === 'undefined') throw new Error("WebGL bloqueado");
-
             experienceStarted = true;
             experienceStartMs = performance.now();
 
@@ -390,7 +386,6 @@
                 cvs.width = size; cvs.height = size;
                 const ctx = cvs.getContext('2d');
                 
-                // Si es icono, dibujamos en grande y sin marco
                 if (plate.icon) {
                     const tex = new THREE.CanvasTexture(cvs);
                     tex.anisotropy = 8; tex.needsUpdate = true;
@@ -398,7 +393,6 @@
                     image.crossOrigin = 'anonymous';
                     image.onload = () => {
                         ctx.clearRect(0, 0, size, size);
-                        // Hacemos el Spiderman lo más grande posible
                         const scale = Math.min(size / image.width, size / image.height) * 0.95; 
                         const drawW = image.width * scale; const drawH = image.height * scale;
                         const drawX = (size - drawW) / 2; const drawY = (size - drawH) / 2;
@@ -408,7 +402,6 @@
                     image.src = plate.icon;
                     return tex;
                 } else {
-                    // Si es corazón normal, dibujamos el marco primero
                     ctx.drawImage(fallbackCanvas, 0, 0, size, size);
                     const tex = new THREE.CanvasTexture(cvs);
                     tex.anisotropy = 8; tex.needsUpdate = true;
@@ -422,7 +415,6 @@
                 const mesh = new THREE.Mesh(new THREE.CircleGeometry(1.05 * 0.5, 64), new THREE.MeshBasicMaterial({ map: canvasTex, transparent: true, side: THREE.DoubleSide, depthWrite: false }));
                 mesh.userData = { plate: p, index: i };
                 
-                // Matemática para distribuir exactamente 6 elementos en círculo
                 const total = window.plates.length;
                 const pairIndex = Math.floor(i / 2);
                 const pairs = Math.ceil(total / 2);
@@ -524,14 +516,12 @@
                     if (hits.length > 0) {
                         const plate = hits[0].object.userData.plate;
                         
-                        // LÓGICA DE SPIDERMAN: No abre foto, solo un mensaje especial
                         if (plate.isSpidey) {
                             document.getElementById('message-title').textContent = "¡Thwip! 🕸️ Un beso de tu amigable vecino ❤️";
-                            document.getElementById('message-image-wrap').style.display = 'none'; // Ocultamos el contenedor de imagen
+                            document.getElementById('message-image-wrap').style.display = 'none';
                         } else {
-                            // LÓGICA DE FOTOS NORMALES
                             document.getElementById('message-title').textContent = plate.name;
-                            document.getElementById('message-image-wrap').style.display = 'flex'; // Mostramos el contenedor de imagen
+                            document.getElementById('message-image-wrap').style.display = 'flex';
                             
                             const src = plate.src;
                             if(src){
